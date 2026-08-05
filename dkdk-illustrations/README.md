@@ -16,9 +16,19 @@ dkdk(바다코끼리 자화상 IP) 스타일의 한국어 본문 삽화를 생�
 
 ## 캐릭터
 
-dkdk — 의인화 바다코끼리 자화상. 점눈, 뭉툭한 엄니 2개, 웰링턴 안경, 맨번, 다크 티셔츠(화면의 검은 앵커), 크로스백, 지느러미발. 아이덴티티 기준(생성 시 `-i`로 첨부): [`assets/dkdk-board-ink-bw.png`](assets/dkdk-board-ink-bw.png)
+dkdk — 의인화 바다코끼리 자화상. 가늘게 뜬 눈 + 각진 눈썹, 뭉툭한 엄니 2개, 웰링턴 안경, 맨번, 다크 티셔츠(화면의 검은 앵커), 크로스백, 지느러미발. 아이덴티티 기준(생성 시 `-i`로 첨부): [`assets/dkdk-board-ink-bw.png`](assets/dkdk-board-ink-bw.png)
 
-![dkdk model sheet](assets/dkdk-board-ink-bw.png)
+**메인 모델시트** (잉크 / 컬러)
+
+![dkdk model sheet ink](assets/dkdk-board-ink-bw.png)
+
+![dkdk model sheet color](assets/dkdk-board-color.png)
+
+**버라이어티 보드** — 헤어 기장별 바리에이션 · 표정 · 활동(보드게임/체스/요리/프리다이빙/노트북/키보드), 크로스백 없는 버전 (잉크 / 컬러)
+
+![dkdk variation board ink](assets/dkdk-board-ink-variation.png)
+
+![dkdk variation board color](assets/dkdk-board-color-variation.png)
 
 ## 구성
 
