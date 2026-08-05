@@ -20,7 +20,8 @@ description: dkdk(바다코끼리 자화상 IP) 스타일의 한국어 본문 �
 - `references/composition-patterns.md`: 구조 유형, 은유 발명법, 복제 금지 규칙.
 - `references/prompt-template.md`: 장당 생성 프롬프트 템플릿.
 - `references/qa-checklist.md`: 생성 후 검수와 반복 규칙.
-- 아이덴티티 기준 이미지: `/Users/dk/Desktop/H9/0.project/.hide/ing/dkdk/final/dkdk-board-bw.png` (흑백 모델시트). 스타일 캘리브레이션용이며 구도를 베끼는 용도가 아님.
+- 아이덴티티 기준 이미지: `assets/dkdk-board-bw.png` (흑백 모델시트). 스타일 캘리브레이션용이며 구도를 베끼는 용도가 아님.
+- `assets/examples/`: 완성 예시. 저빈도 시각 캘리브레이션 전용 — 구도·물건·라벨을 베끼지 말 것.
 
 ## 워크플로
 
