@@ -2,7 +2,7 @@
 
 한 장씩 개별 생성한다. 본문 내용에 맞게 변수를 교체하고, 여러 장을 한 이미지에 합치지 않는다.
 
-브리프 파일(`./brief/<slug>-NN.md`)에 아래 내용을 그대로 채워 넣고, 생성 시 모델시트(`assets/dkdk-board-bw.png`)를 `-i`로 반드시 첨부한다 (SKILL.md 3단계).
+브리프 파일(`./brief/<slug>-NN.md`)에 아래 내용을 그대로 채워 넣고, 생성 시 모델시트(`assets/dkdk-board-ink-bw.png`)를 `-i`로 반드시 첨부한다 (SKILL.md 3단계).
 
 ```text
 Generate one standalone 16:9 horizontal Korean article illustration.
