@@ -22,7 +22,7 @@ dkdk — 의인화 바다코끼리 자화상. 가늘게 뜬 눈 + 각진 눈썹,
 
 ![dkdk model sheet ink](assets/dkdk-board-ink-bw.png)
 
-![dkdk model sheet color](assets/dkdk-board-color.png)
+![dkdk model sheet color](assets/dkdk-board-color-v2.png)
 
 **버라이어티 보드** — 헤어 기장별 바리에이션 · 표정 · 활동(보드게임/체스/요리/프리다이빙/노트북/키보드), 크로스백 없는 버전 (잉크 / 컬러)
 
