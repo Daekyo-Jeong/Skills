@@ -12,6 +12,16 @@ Claude Code에서 쓰는 개인 스킬 모음. 각 폴더가 스킬 하나이며
 | [**handoff**](./handoff) | 현재 작업 세션의 전체 상태를 HANDOFF.md로 캡처해서, 다음 Claude(또는 사람)가 컨텍스트 손실 없이 이어받게 한다. |
 | [**plain-writing**](./plain-writing) | 글을 쉬운 언어로, 사람이 쓴 것처럼(AI 티·번역투 없이) 쓰고 다듬는다. 보고서·이메일·공지·블로그 등 한국어 우선, 영어에도 적용. |
 
+## dkdk-illustrations 예시
+
+> "단순한 규칙 하나(×2)가 왕국을 삼키는 복잡성이 된다" — 체스판 밀알 전설
+
+![밀알 지수 증가](dkdk-illustrations/assets/examples/02-wheat-doubling.png)
+
+> "흩어진 메모·채팅을 하나의 기억 우물로 끌어모은다"
+
+![기억 우물](dkdk-illustrations/assets/examples/01-memory-well.png)
+
 ## 설치
 
 ```bash
