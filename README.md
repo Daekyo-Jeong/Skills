@@ -16,11 +16,11 @@ Claude Code에서 쓰는 개인 스킬 모음. 각 폴더가 스킬 하나이며
 
 > "단순한 규칙 하나(×2)가 왕국을 삼키는 복잡성이 된다" — 체스판 밀알 전설
 
-![밀알 지수 증가](dkdk-illustrations/assets/examples/02-wheat-doubling.png)
+![밀알 지수 증가](dkdk-illustrations/assets/examples/02-wheat-doubling-ink.png)
 
 > "흩어진 메모·채팅을 하나의 기억 우물로 끌어모은다"
 
-![기억 우물](dkdk-illustrations/assets/examples/01-memory-well.png)
+![기억 우물](dkdk-illustrations/assets/examples/01-memory-well-ink.png)
 
 ## 설치
 
