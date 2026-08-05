@@ -2,7 +2,7 @@
 
 한 장씩 개별 생성한다. 본문 내용에 맞게 변수를 교체하고, 여러 장을 한 이미지에 합치지 않는다.
 
-easel 브리프 파일(`./brief/<slug>-NN.md`)에 아래 내용을 그대로 채워 넣는다.
+브리프 파일(`./brief/<slug>-NN.md`)에 아래 내용을 그대로 채워 넣고, 생성 시 모델시트(`assets/dkdk-board-bw.png`)를 `-i`로 반드시 첨부한다 (SKILL.md 3단계).
 
 ```text
 Generate one standalone 16:9 horizontal Korean article illustration.
@@ -36,7 +36,12 @@ Black for main line art and dkdk (dark tee filled solid). Orange for main flow/p
 
 Constraints:
 One image explains only one core structure. Keep the main subject around 40%-60% of the canvas. Preserve at least 35% blank white space. Use at most 3-6 short handwritten Korean labels — fewer labels means fewer typos; Korean text must be spelled exactly as given. Do not write a title in the top-left corner. Do not write the structure type on the image. Do not make it a formal diagram, course slide, or dense explainer. Invent a fresh visual metaphor for this specific article; do not copy prior compositions. It should be clear but not instructional, interesting but not childish, strange but clean.
+
+Character identity reference:
+The attached image is the official dkdk character model sheet. Match the character EXACTLY as drawn there — especially the face: dot eyes placed INSIDE the glasses lenses, the large rounded muzzle mass occupying the lower half of the face, the dense neatly-groomed whisker/beard mass (not sparse individual whisker lines), tusk shape and placement, head proportions, man-bun size. Only translate the rendering into loose hand-drawn ink sketch linework to match the illustration style; do not change any anatomical proportions or facial layout.
 ```
+
+마지막 "Character identity reference" 블록은 고정 문구다 — 모델시트를 `-i`로 첨부할 때 항상 프롬프트에 포함시킨다.
 
 ## 수정 반복 프롬프트
 
