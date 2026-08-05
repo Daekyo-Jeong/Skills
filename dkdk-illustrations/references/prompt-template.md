@@ -38,10 +38,13 @@ Constraints:
 One image explains only one core structure. Keep the main subject around 40%-60% of the canvas. Preserve at least 35% blank white space. Use at most 3-6 short handwritten Korean labels — fewer labels means fewer typos; Korean text must be spelled exactly as given. Do not write a title in the top-left corner. Do not write the structure type on the image. Do not make it a formal diagram, course slide, or dense explainer. Invent a fresh visual metaphor for this specific article; do not copy prior compositions. It should be clear but not instructional, interesting but not childish, strange but clean.
 
 Character identity reference:
-The attached image is the official dkdk character model sheet. Match the character EXACTLY as drawn there — especially the face: dot eyes placed INSIDE the glasses lenses, the large rounded muzzle mass occupying the lower half of the face, the dense neatly-groomed whisker/beard mass (not sparse individual whisker lines), tusk shape and placement, head proportions, man-bun size. Only translate the rendering into loose hand-drawn ink sketch linework to match the illustration style; do not change any anatomical proportions or facial layout.
+The attached image is the official dkdk character model sheet (pure black-and-white ink). Match the character EXACTLY as drawn there — especially the face: dot eyes placed INSIDE the glasses lenses, the large rounded muzzle mass occupying the lower half of the face, the dense neatly-groomed whisker/beard mass (not sparse individual whisker lines), tusk shape and placement, head proportions, and the man-bun at the same relative size as the sheet (solid black with a visible hairline — not a tiny knob). The crossbody bag stays solid black; where black elements overlap, separate them with thin white outline lines only. Keep the two-value ink rendering with loose hand-drawn linework for the CHARACTER and SCENE; do not change any anatomical proportions or facial layout.
+
+Annotation colors (STRICT — the black-and-white rule applies ONLY to the character and scene linework, NOT to the annotations):
+The handwritten Korean labels and arrows MUST keep their assigned colors from the "Color use" section above — blue/orange/red. Do not render them in black.
 ```
 
-마지막 "Character identity reference" 블록은 고정 문구다 — 모델시트를 `-i`로 첨부할 때 항상 프롬프트에 포함시킨다.
+마지막 두 블록("Character identity reference", "Annotation colors")은 고정 문구다 — 모델시트를 `-i`로 첨부할 때 항상 프롬프트에 포함시킨다. 특히 Annotation colors 블록을 빼먹으면 흑백 잉크 지시가 라벨 색까지 집어삼킨다 (실측 gotcha).
 
 ## 수정 반복 프롬프트
 
