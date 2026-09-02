@@ -23,5 +23,5 @@ cp -R Skills/<skill-name> ~/.claude/skills/
 
 ## 참고
 
-- **dkdk-illustrations**는 이미지 생성 백엔드로 [easel](https://github.com/Daekyo-Jeong)(Codex 데스크탑 앱 + ocx 프록시, API 키 불필요)을 사용한다. 다른 환경에서는 `SKILL.md`의 생성 단계를 각자의 이미지 생성 도구로 교체하면 된다.
+- **dkdk-illustrations**는 이미지 생성 백엔드로 [easel](https://github.com/Daekyo-Jeong)(Codex CLI, ChatGPT 구독 로그인, API 키 불필요)을 사용한다. 다른 환경에서는 `SKILL.md`의 생성 단계를 각자의 이미지 생성 도구로 교체하면 된다.
 - 스킬 구조는 Claude Code의 [Agent Skills](https://code.claude.com/docs/en/skills) 규격(SKILL.md + references/)을 따른다.

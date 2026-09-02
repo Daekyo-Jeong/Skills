@@ -13,7 +13,7 @@ description: 발산-선택-수렴 디자인 루프 — 브리프에서 이미지
 **쓰지 않을 때**: 단순 이미지 1장 생성, SVG/코드 네이티브 그래픽, 텍스트 작업.
 
 ## 요구
-- macOS · **Codex 데스크탑 앱**(ChatGPT 구독 로그인) · `claude` CLI. API 키 불필요.
+- macOS · **Codex CLI**(`codex`, ChatGPT 구독 로그인) · `claude` CLI. API 키 불필요. (Codex.app이 있으면 그 번들 codex를 우선 사용)
 - `easel`가 PATH에 설치돼 있음(`which easel`로 확인). 어느 폴더에서든 `easel`로 호출된다.
 
 ## ⚠️ 실행 위치 = 결과 위치 (중요)
