@@ -1,0 +1,164 @@
+<title>디디 설정보드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans+KR:wght@400;700&family=VT323&display=swap">
+<style>
+/* 레이아웃: 턴어라운드 한 줄이 무대. 눈, 엄니, 발 기준선이 네 면을 가로지르고 아래로 자세, 소품, 규칙이 이어진다 */
+:root {
+  --ink: #000000;
+  --paper: #ffffff;
+  --dim: #8f8f8f;
+  --line: #2b2b2b;
+  --didi: #00ff99;
+  --mono: 'IBM Plex Mono', 'IBM Plex Sans KR', ui-monospace, monospace;
+  --kr: 'IBM Plex Sans KR', system-ui, sans-serif;
+  --retro: 'VT323', ui-monospace, monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--ink); color: var(--paper); }
+body {
+  font-family: var(--kr);
+  padding-block: 32px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.board { max-width: 1320px; margin-inline: auto; display: grid; gap: 56px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 24px; }
+h1 { margin: 0; font-family: var(--retro); font-weight: 400; font-size: 72px; line-height: .9; color: var(--didi); }
+header p { margin: 0; color: var(--dim); font-size: 15px; line-height: 1.6; }
+h2 { margin: 0 0 16px; font-size: 15px; font-weight: 700; }
+canvas { display: block; image-rendering: pixelated; max-width: 100%; height: auto; }
+.turn { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.turn figure { margin: 0; display: grid; gap: 14px; justify-items: center; min-width: 0; }
+.turn canvas { width: 100%; }
+.turn .guides { position: absolute; inset: 0 0 auto; pointer-events: none; }
+.guide { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--dim); opacity: .55; }
+.guide span { position: absolute; right: 0; top: -18px; font: 12px var(--mono); color: var(--dim); background: var(--ink); padding-left: 6px; }
+figcaption { font-size: 14px; color: var(--paper); }
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 16px; }
+.grid figure { margin: 0; display: grid; gap: 8px; min-width: 0; text-align: center; }
+.grid canvas { width: 100%; }
+.rules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 40px; }
+.rules > section { min-width: 0; }
+.swatches { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.swatches li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: center; font-size: 14px; }
+.swatches i { width: 22px; height: 22px; outline: 1px solid var(--line); }
+.swatches code { font: 12px var(--mono); color: var(--dim); }
+.swatches .gap { margin-top: 10px; }
+.sizes { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 24px; }
+.sizes figure { margin: 0; display: grid; gap: 8px; }
+.sizes figcaption { font: 12px var(--mono); color: var(--dim); }
+ul.keep { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14px; line-height: 1.55; }
+@media (max-width: 860px) {
+  .rules { grid-template-columns: minmax(0, 1fr); }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .turn { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .turn .guides { display: none; }
+  h1 { font-size: 56px; }
+}
+</style>
+
+<div class="board">
+  <header>
+    <h1>DIDI</h1>
+    <p>디디. dkdk의 픽셀 바다코끼리. 안경과 흰 엄니가 얼굴이고, 몸은 네온 그린 한 색이다.</p>
+  </header>
+
+  <section aria-label="턴어라운드">
+    <h2>세 면</h2>
+    <div class="turn" id="turn"><div class="guides" id="guides" aria-hidden="true"></div></div>
+  </section>
+
+  <section>
+    <h2>손 위치</h2>
+    <div class="grid" id="hands"></div>
+  </section>
+
+  <section>
+    <h2>표정과 자세</h2>
+    <div class="grid" id="faces"></div>
+  </section>
+
+  <section>
+    <h2>물건을 들었을 때</h2>
+    <div class="grid" id="hobbies"></div>
+  </section>
+
+  <section class="rules">
+    <section>
+      <h2>색</h2>
+      <ul class="swatches" id="swatches"></ul>
+    </section>
+    <section>
+      <h2>크기</h2>
+      <div class="sizes" id="sizes"></div>
+    </section>
+    <section>
+      <h2>바꾸지 않는 것</h2>
+      <ul class="keep">
+        <li>초록은 디디 몸에만 쓴다. 물건과 효과는 흰색과 회색이다.</li>
+        <li>안경은 얼굴의 중심이다. 어느 각도든 벗지 않는다.</li>
+        <li>디디는 정면 그림을 밀어낸 판이다. 몸을 돌려도 반측면까지만 쓰고, 측면 그림은 새로 쓰지 않는다.</li>
+        <li>반측면은 정면 그림을 그대로 두고 옆면 띠 2칸만 붙인다.</li>
+        <li>손은 2칸 덩어리로, 몸 옆선의 어깨부터 허리까지 어디든 붙일 수 있다.</li>
+        <li>엄니는 윗턱에 붙은 2칸 두께다. 입을 벌려도 그대로다.</li>
+        <li>손발은 뭉툭하다. 지금 픽셀판에는 맨번을 넣지 않았다.</li>
+        <li>몸 칸은 그대로 두고 물건만 위에 얹는다.</li>
+      </ul>
+    </section>
+  </section>
+</div>
+
+<script>
+const DATA = {"pal": {"g": "#00FF99", "k": "#0E110F", "w": "#FFFFFF", "e": "#0B7A52", "s": "#00B86E", "p": "#FFFFFF", "q": "#A6A6A6", "r": "#5C5C5C"}, "views": [{"label": "정면", "rows": ["......gggggggg......", "....gggggggggggg....", "...gkkkkggggkkkkg...", "...gkggkkkkkkggkg...", "...gkkkkggggkkkkg...", "..ggggggkggkgggggg..", "..gggggggggggggggg..", "..gggwwggggggwwggg..", "..gggwwggggggwwggg..", ".ggggwwggggggwwgggg.", ".ggggwwggggggwwgggg.", "...gggggggggggggg...", "...gg..gggggg..gg...", "...gg..gggggg..gg..."]}, {"label": "반측면", "rows": ["......ssgggggggg......", "....ssgggggggggggg....", "...ssgkkkkggggkkkkg...", "...ssgkggkkkkkkggkg...", "...ssgkkkkggggkkkkg...", "..ssggggggkggkgggggg..", "..ssgggggggggggggggg..", "..ssgggwwggggggwwggg..", "..ssgggwwggggggwwggg..", ".ssggggwwggggggwwgggg.", ".ssggggwwggggggwwgggg.", "...ssgggggggggggggg...", "...ssgg..gggggg..gg...", "...ssgg..gggggg..gg..."]}, {"label": "후면", "rows": ["......gggggggg......", "....gggggggggggg....", "...gggggggggggggg...", "...gggggggggggggg...", "...gggggggggggggg...", "..gggggggggggggggg..", "..ggggeeeeeeeegggg..", "..ggeeggggggggeegg..", "..gggggggggggggggg..", ".gggggggggggggggggg.", ".gggggggeeeeggggggg.", "...ggggggeegggggg...", "...gg..gggggg..gg...", "...gg..gggggg..gg..."]}], "hands": [{"label": "기본", "rows": ["....................................", "....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkggkkkkkkggkg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkggkgggggg..........", "..........gggggggggggggggg..........", "..........gggwwggggggwwggg..........", "..........gggwwggggggwwggg..........", ".........ggggwwggggggwwgggg.........", ".........ggggwwggggggwwgggg.........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}, {"label": "한 손 어깨", "rows": ["....................................", "....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkggkkkkkkggkg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkggkggggggg.........", "..........ggggggggggggggggg.........", "..........gggwwggggggwwggg..........", "..........gggwwggggggwwggg..........", ".........ggggwwggggggwwggg..........", ".........ggggwwggggggwwggg..........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}, {"label": "두 손 가슴", "rows": ["....................................", "....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkggkkkkkkggkg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkggkgggggg..........", "..........gggggggggggggggg..........", ".........ggggwwggggggwwgggg.........", ".........ggggwwggggggwwgggg.........", "..........gggwwggggggwwggg..........", "..........gggwwggggggwwggg..........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}, {"label": "엇갈림", "rows": ["....................................", "....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkggkkkkkkggkg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkggkgggggg..........", ".........ggggggggggggggggg..........", ".........ggggwwggggggwwggg..........", "..........gggwwggggggwwggg..........", "..........gggwwggggggwwggg..........", "..........gggwwggggggwwgggg.........", "...........ggggggggggggggg..........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}], "faces": [{"label": "기본", "rows": ["....................................", "....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkggkkkkkkggkg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkggkgggggg..........", "..........gggggggggggggggg..........", "..........gggwwggggggwwggg..........", "..........gggwwggggggwwggg..........", ".........ggggwwggggggwwgggg.........", ".........ggggwwggggggwwgggg.........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}, {"label": "말하기", "rows": ["....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkggkkkkkkggkg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkggkgggggg..........", "..........gggggggggggggggg..........", "..........ggkwwkkkkkkwwkgg..........", "..........ggkwwkkkkkkwwkgg..........", ".........gggkwwkkkkkkwwkggg.........", ".........gggkwwkkkkkkwwkggg.........", "...........gkkkkkkkkkkkkg...........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}, {"label": "눈 깜빡", "rows": ["....................................", "....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkeekkkkkkeekg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkeekgggggg..........", "..........gggggggggggggggg..........", "..........gggwwggggggwwggg..........", "..........gggwwggggggwwggg..........", ".........ggggwwggggggwwgggg.........", ".........ggggwwggggggwwgggg.........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}, {"label": "웃음", "rows": ["....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkeekkkkkkeekg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkeekgggggg..........", "..........gggggggggggggggg..........", "..........ggkwwkkkkkkwwkgg..........", "..........ggkwwkkkkkkwwkgg..........", ".........gggkwwkkkkkkwwkggg.........", ".........gggkwwkkkkkkwwkggg.........", "...........gkkkkkkkkkkkkg...........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}, {"label": "놀람", "rows": ["....................................", "..............gggggggg........w.....", "............gggggggggggg......w.....", "...........gkkkkggggkkkkg.....w.....", "...........gkggkkkkkkggkg...........", "...........gkkkkggggkkkkg.....w.....", "..........ggggggkggkgggggg..........", "........g.gggggggggggggggg.g........", "........ggggkwwkkkkkkwwkgggg........", ".........gggkwwkkkkkkwwkggg.........", ".........gggkwwkkkkkkwwkggg.........", "...........gkwwkkkkkkwwkg...........", "...........gkkkkkkkkkkkkg...........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg...........", "...................................."]}, {"label": "생각", "rows": ["....................................", "....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg........w..", "...........gkggkkkkkkggkg...........", "...........gkkkkggggkkkkg......w....", "..........ggggggkggkgggggg..........", "..........gggggggggggggggg...w......", "..........gggwwggggggwwggg..........", "..........gggwwggggggwwgggg.........", ".........ggggwwggggggwwgggg.........", ".........ggggwwggggggwwgg...........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}, {"label": "잠", "rows": ["....................................", ".............................ppppp..", "................................p...", "..............gggggggg.........p....", "............gggggggggggg......p.....", "...........gkkkkggggkkkkg....ppppp..", "...........gkeekkkkkkeekg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkeekgggggg..........", "..........gggggggggggggggg..........", "..........ggkwwkkkkkkwwkgg..........", "..........ggkwwkkkkkkwwkgg..........", ".........gggkwwkkkkkkwwkggg.........", ".........ggggwwggggggwwgggg.........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}, {"label": "손 흔들기", "rows": ["....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkggkkkkkkggkg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkggkgggggg..........", "..........gggggggggggggggg.g........", "..........ggkwwkkkkkkwwkgggg........", "..........ggkwwkkkkkkwwkggg.........", ".........gggkwwkkkkkkwwkggg.........", ".........gggkwwkkkkkkwwkg...........", "...........gkkkkkkkkkkkkg...........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg..........."]}], "hobbies": [{"label": "프리다이빙", "rows": ["......qq............................", ".......pp...........................", ".......qq...........................", ".......pp...........................", ".......pp...........................", ".......pp.....gggggggg..............", ".......pp...gggggggggggg............", ".......pp..gkkkkggggkkkkg...........", ".......pprrgkggkkkkkkggkg...........", ".......pp..gkkkkggggkkkkg...........", ".......pp.ggggggkggkgggggg..........", ".......pp.gggggggggggggggg..........", ".......ppppprwwggggggwwggg..........", "..........gggwwggggggwwggg..........", ".........ggggwwggggggwwgggg.........", ".........ggggwwggggggwwgggg.........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg...........", "............rrrrrrrrrrrr............", "............pqrqqqqqqrqp............", "...........pqqrqqqqqqrqqp...........", "..........pqqrqqqqqqqqrqqp..........", "..........pqqrqqqqqqqqrqqp..........", "........pqqqrqqqqqqqqqqrqqqp........", ".......pqqqqrqqq....qqqrqqqqp.......", "......pqqqqq............qqqqqp......"]}, {"label": "낚시", "rows": ["....................................", "....................................", "....................................", "....................................", "....................................", "..................................r.", ".................................pr.", "...............................pp.r.", "..............................p...r.", ".............................p....r.", ".........ssgggggggg.........p.....r.", ".......ssgggggggggggg.......p.....r.", "......ssgkkkkggggkkkkg.....p......r.", "......ssgkggkkkkkkggkg.....p......r.", "......ssgkkkkggggkkkkg....p.......r.", ".....ssggggggkggkgggggg...p.......r.", ".....ssgggggggggggggggg..p........r.", ".....ssgggwwggggggwwggg..p........r.", ".....ssgggwwggggggwwggg.p.........r.", "....ssggggwwggggggwwgggr.........pp.", "....ssggggwwggggggwwgggr.........qq.", "......ssggggggggggggggr.............", "......ssgg..gggggg..gg..............", "......ssgg..gggggg..gg..............", "....................................", "....................................", "...................................."]}, {"label": "요리", "rows": ["....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "........ssgggggggg..................", "......ssgggggggggggg.........pp.....", ".....ssgkkkkggggkkkkg.......pppp....", ".....ssgkggkkkkkkggkg........pp.....", ".....ssgkkkkggggkkkkg...............", "....ssggggggkggkgggggg...........q..", "....ssgggggggggggggggg.....q........", "....ssgggwwggggggwwggg..............", "....ssgggwwggggggwwggg..............", "...ssggggwwggggggwwgggg.............", "...ssggggwwggggggwwggrrrrrpqqqqqqqp.", ".....ssgggggggggggggg......pppppp...", ".....ssgg..gggggg..gg...............", ".....ssgg..gggggg..gg...............", "....................................", "....................................", "...................................."]}, {"label": "뜨개질", "rows": ["....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "........ssgggggggg..................", "......ssgggggggggggg................", ".....ssgkkkkggggkkkkg...............", ".....ssgkggkkkkkkggkg...............", ".....ssgkkkkggggkkkkg...............", "....ssggggggkggkgggggp.....p........", "....ssggggggggggggggggp...p.........", "....ssgggwwggggggwwggg.p.p..........", "....ssgggwwggggggwwggg.ppp..........", "...ssggggwwggggggwwgggprqrpr...pqp..", "...ssggggwwggggggwwggprqrqrp..pqpqp.", ".....ssgggggggggggggp.qrqrqrp.qpqpq.", ".....ssgg..gggggg..gg.rqrqrqrrrqpqp.", ".....ssgg..gggggg..gg....rrr...pqp..", "....................................", "....................................", "...................................."]}, {"label": "컴퓨터", "rows": ["....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkggkkkkkkggkg...........", "...........gkkkkggggkkkkg...........", "..........ggggggkggkgggggg..........", "..........gggggggggggggggg..........", "..........gggwwggggggwwggg..........", "..........gggwwggggggwwggg..........", ".........ggggwwggggggwwgggg.........", ".........gppppppppppppppppg.........", "..........prrrrrrrrrrrrrrp..........", "..........prrrrrrrrrrrrrrp..........", "..........prrrrrrpprrrrrrp..........", "..........prrrrrrrrrrrrrrp..........", "........qqqqqqqqqqqqqqqqqqqq........", "...................................."]}, {"label": "그림", "rows": ["....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "........................qqqqqqqqqqq.", "........................qpppppppppq.", "........................qpppppppppq.", "........................qppprpppppq.", ".......ssgggggggg.......qpprprpprpq.", ".....ssgggggggggggg.....qpprprprppq.", "....ssgkkkkggggkkkkg....qprppprpppq.", "....ssgkggkkkkkkggkg....qpqpppppppq.", "....ssgkkkkggggkkkkg....qqppppppppq.", "...ssggggggkggkgggggg...qqqqqqqqqqq.", "...ssgggggggggggggggg..q..r.....r...", "...ssgggwwggggggwwggg..q..r.....r...", "...ssgggwwggggggwwggg.q..r.......r..", "..ssggggwwggggggwwgggq...r.......r..", "..ssggggwwggggggwwggqg...r.......r..", "....ssgggggggggggggg.....r.......r..", "....ssgg..gggggg..gg....r.........r.", "....ssgg..gggggg..gg....r.........r.", "....................................", "....................................", "...................................."]}, {"label": "노래", "rows": ["....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "..............................pp....", "..............................p.....", "..............................p.....", "..............gggggggg.......pp.....", "............gggggggggggg............", "...........gkkkkggggkkkkg........pp.", "...........gkggkkkkkkggkg........p..", "...........gkkkkggggkkkkg........p..", "..........ggggggkggkgggggg......pp..", "........g.gggggggggggggggg.g........", "........ggggkwwkkkkkkwwkgggg........", ".........gggkwwkkkkkkwwkggg.........", ".........gggkwwkkkkkkwwkggg.........", "...........gkwwkqppqkwwkg...........", "...........gkkkkpqqpkkkkg...........", "...........gggggqppqggggg...........", "...........gg..ggrrgg..gg...........", "...........gg..ggrrgg..gg...........", ".................rr.................", ".............qqqqqqqqqq.............", "...................................."]}, {"label": "운동", "rows": ["....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "....................................", "..............gggggggg..............", "............gggggggggggg............", "...........gkkkkggggkkkkg...........", "...........gkggkkkkkkggkg...........", "...q.....q.gkkkkggggkkkkg.q.....q...", "...qrrrrrqggggggkggkggggggqrrrrrq...", "...q....gqggggggggggggggggqg....q...", "........gggggwwggggggwwggggg........", ".........ggggwwggggggwwgggg.........", ".........ggggwwggggggwwgggg.........", "...........ggwwggggggwwgg...........", "...........gggggggggggggg...........", "...........gg..gggggg..gg...........", "...........gg..gggggg..gg...........", "....................................", "....................................", "...................................."]}], "small": [{"label": "기본 20×14", "rows": ["......gggggggg......", "....gggggggggggg....", "...gkkkkggggkkkkg...", "...gkggkkkkkkggkg...", "...gkkkkggggkkkkg...", "..ggggggkggkgggggg..", "..gggggggggggggggg..", "..gggwwggggggwwggg..", "..gggwwggggggwwggg..", ".ggggwwggggggwwgggg.", ".ggggwwggggggwwgggg.", "...gggggggggggggg...", "...gg..gggggg..gg...", "...gg..gggggg..gg..."]}, {"label": "입 벌림 20×15", "rows": ["......gggggggg......", "....gggggggggggg....", "...gkkkkggggkkkkg...", "...gkggkkkkkkggkg...", "...gkkkkggggkkkkg...", "..ggggggkggkgggggg..", "..gggggggggggggggg..", "..ggkwwkkkkkkwwkgg..", "..ggkwwkkkkkkwwkgg..", ".gggkwwkkkkkkwwkggg.", ".gggkwwkkkkkkwwkggg.", "...gkkkkkkkkkkkkg...", "...gggggggggggggg...", "...gg..gggggg..gg...", "...gg..gggggg..gg..."]}, {"label": "파비콘 14×12", "rows": ["...gggggggg...", ".gggggggggggg.", "gkkkkggggkkkkg", "gkggkkkkkkggkg", "gkkkkggggkkkkg", "gggggkggkggggg", "ggwwggggggwwgg", "ggwwggggggwwgg", "ggwwggggggwwgg", ".gwwggggggwwg.", ".gggggggggggg.", ".gg.gggggg.gg."]}]};
+function draw(rows, scale) {
+  const c = document.createElement('canvas');
+  const w = Math.max(...rows.map(r => r.length));
+  c.width = w * scale; c.height = rows.length * scale;
+  const g = c.getContext('2d');
+  rows.forEach((row, y) => [...row].forEach((ch, x) => {
+    if (ch !== '.') { g.fillStyle = DATA.pal[ch]; g.fillRect(x * scale, y * scale, scale, scale); }
+  }));
+  return c;
+}
+function fig(item, scale) {
+  const f = document.createElement('figure');
+  const c = draw(item.rows, scale);
+  c.setAttribute('role', 'img'); c.setAttribute('aria-label', '디디 ' + item.label);
+  const cap = document.createElement('figcaption'); cap.textContent = item.label;
+  f.append(c, cap);
+  return f;
+}
+const turn = document.getElementById('turn');
+// 칸 크기를 네 면이 같게 둔다. 반측면은 22칸이라 그만큼 넓다
+DATA.views.forEach(v => { const f = fig(v, 12); f.querySelector('canvas').style.maxWidth = v.rows[0].length * 12 + 'px'; turn.append(f); });
+for (const id of ['hands', 'faces', 'hobbies']) document.getElementById(id).append(...DATA[id].map(i => fig(i, 8)));
+document.getElementById('sizes').append(...DATA.small.map(i => fig(i, 3)));
+
+const GUIDES = [['눈', 3.5], ['엄니', 9.5], ['발', 14]];
+const guides = document.getElementById('guides');
+function placeGuides() {
+  const c = turn.querySelector('canvas'), top = c.getBoundingClientRect().top - turn.getBoundingClientRect().top;
+  const cell = c.getBoundingClientRect().height / 14;
+  guides.replaceChildren(...GUIDES.map(([name, row]) => {
+    const d = document.createElement('div'); d.className = 'guide'; d.style.top = top + row * cell + 'px';
+    const s = document.createElement('span'); s.textContent = name; d.append(s);
+    return d;
+  }));
+}
+addEventListener('resize', placeGuides); placeGuides();
+
+const SWATCH = [
+  ['몸', 'g'], ['안경, 코, 입', 'k'], ['엄니', 'w'], ['눈 감을 때, 후면의 주름', 'e'], ['반측면의 옆면', 's'],
+  ['물건 밝은 면', 'p', 1], ['물건 중간', 'q'], ['물건 어두운 면', 'r'],
+];
+document.getElementById('swatches').replaceChildren(...SWATCH.map(([name, key, gap]) => {
+  const li = document.createElement('li'); if (gap) li.className = 'gap';
+  const i = document.createElement('i'); i.style.background = DATA.pal[key];
+  const t = document.createElement('span'); t.textContent = name + ' ';
+  const code = document.createElement('code'); code.textContent = DATA.pal[key].toUpperCase(); t.append(code);
+  li.append(i, t);
+  return li;
+}));
+</script>
