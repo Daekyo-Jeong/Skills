@@ -14,6 +14,7 @@ Claude Code에서 쓰는 개인 스킬 모음. 각 폴더가 스킬 하나이며
 | [**dkdk-deploy**](./dkdk-deploy) | 개인 프로젝트를 Vercel + Cloudflare로 배포하고 `*.dkdk.me` 서브도메인을 연결하는 절차·함정 모음. CI 빌드 검증, CLI scope, Hobby 플랜 비공개 게이트(middleware+OAuth)까지. |
 | [**boardgame-port**](./boardgame-port) | 보드게임을 dkdk-arcade 웹 게임으로 이식하는 리츄얼 — 공식 룰 원문·카드 이미지 확보 → 리스킨 대응표 → 정보 등가성 → 모바일 조작 규칙 → 퍼즈/봇 검증 → 배포. |
 | [**didi**](./didi) | dkdk 도트 마스코트 디디(네온 초록 바다코끼리)의 원본 그림·팔레트·모션과 그리는 도구. 몸은 새로 그리지 않고 `didi.json`에서 꺼내 쓰며, 형태 규칙(정면을 밀어낸 판, 반측면까지만)과 검사를 함께 담았다. 원본 작업장은 dkdk-mov. |
+| [**dkdk-design**](./dkdk-design) | dkdk 서비스 공통 디자인 시스템. 메인·feed에서 추출한 색(종이·잉크·그린=시스템·핑크=사람), 글꼴(Pretendard + IBM Plex Mono), 간격·모서리·모션 토큰과 컴포넌트 패턴, 새 서비스용 최소 토큰 CSS. |
 
 ## 설치
 
