@@ -7,7 +7,7 @@ A mood is a small dict of axes the presets understand:
   space       0..1   reverb size / wetness
   texture     'vinyl' | 'rain' | 'fire' | 'birds' | 'night' | 'ocean' | 'none' | None (genre default)
   palette     instrument palette name or None (picked from energy/brightness)
-  genre       'lofi' | 'newage' | None (inferred)
+  genre       'lofi' | 'newage' | 'jazz' | 'chiptune' | None (inferred)
 
 parse() turns free text (Korean or English) into these axes with a keyword
 lexicon. Claude can also pass the axes explicitly (--set energy=0.3 ...), which
@@ -41,7 +41,9 @@ LEXICON = [
      dict(genre='newage', energy=-0.35, space=+0.3)),
     (['로파이', '로우파이', 'lofi', 'lo-fi', '힙합', 'hiphop', 'hip hop', 'beats'], dict(genre='lofi')),
     (['뉴에이지', 'new age', 'newage', 'ambient', '앰비언트', '피아노 솔로'], dict(genre='newage')),
-    (['재즈', 'jazz', '카페', 'cafe', 'café'], dict(genre='lofi', prog='neo-soul', palette='rhodes-piano')),
+    (['카페', 'cafe', 'café'], dict(genre='lofi', prog='neo-soul', palette='rhodes-piano')),
+    (['재즈', 'jazz', '스윙', 'swing', '브러시', '트리오', 'trio', '색소폰', 'sax'], dict(genre='jazz')),
+    (['칩튠', 'chiptune', '8bit', '8비트', '8-bit', '레트로 게임', '게임기', '픽셀', 'pixel', '오락실'], dict(genre='chiptune')),
     (['기타', 'guitar'], dict(palette_hint='guitar')),
     (['하프', 'harp'], dict(palette_hint='harp')),
     (['플루트', 'flute'], dict(palette_hint='flute')),
