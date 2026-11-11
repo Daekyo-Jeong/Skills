@@ -29,9 +29,21 @@ PROGRESSIONS = {
                    (45, [55, 59, 60, 64]), (41, [57, 60, 64, 67]), (35, [53, 57, 59, 62]), (40, [56, 59, 62, 67])],
     'sunlit': [(41, [57, 60, 64, 67]), (43, [53, 57, 60, 64]), (40, [55, 59, 62, 64]), (45, [55, 59, 60, 64]),
                (41, [57, 60, 64, 67]), (43, [53, 57, 59, 64]), (36, [52, 55, 59, 62]), (36, [55, 59, 62, 64])],
+    # added 2026-11: I-V-vi-IV, IV-V-iii-vi (royal road), iv-bVII backdoor, i-VI-III-VII, aeolian walk-down
+    'four-chord': [(36, [52, 55, 59, 62]), (43, [55, 59, 62, 64]), (45, [55, 59, 60, 64]), (41, [57, 60, 64, 67]),
+                   (36, [52, 55, 59, 62]), (43, [53, 57, 59, 62]), (45, [55, 60, 64, 67]), (41, [53, 57, 60, 64])],
+    'royal-road': [(41, [57, 60, 64, 67]), (43, [53, 57, 59, 62]), (40, [55, 59, 62, 64]), (45, [55, 59, 60, 64]),
+                   (38, [53, 57, 60, 64]), (43, [53, 57, 59, 64]), (36, [52, 55, 59, 62]), (45, [55, 61, 64, 67])],
+    'backdoor': [(41, [57, 60, 64, 67]), (41, [56, 60, 62, 65]), (46, [56, 60, 62, 65]), (36, [52, 55, 59, 62]),
+                 (45, [55, 60, 64, 67]), (38, [53, 57, 60, 64]), (43, [53, 57, 59, 64]), (36, [55, 59, 62, 64])],
+    'rain-minor': [(45, [55, 59, 60, 64]), (41, [57, 60, 64, 67]), (36, [52, 55, 59, 62]), (43, [55, 59, 62, 64]),
+                   (45, [55, 60, 64, 67]), (41, [52, 57, 60, 67]), (38, [53, 57, 60, 64]), (40, [56, 59, 62, 65])],
+    'aeolian-walk': [(45, [55, 59, 60, 64]), (43, [55, 59, 62, 64]), (41, [57, 60, 64, 67]), (40, [55, 59, 62, 64]),
+                     (38, [53, 57, 60, 64]), (40, [55, 59, 62, 67]), (41, [52, 57, 60, 67]), (40, [56, 59, 62, 65])],
 }
-MODE = {'major': ['ii-V-I-vi', 'neo-soul', 'sunlit', 'descending'],
-        'minor': ['minor-drift', 'dorian-night', 'melancholy', 'descending']}
+MODE = {'major': ['ii-V-I-vi', 'neo-soul', 'sunlit', 'descending', 'four-chord', 'royal-road', 'backdoor'],
+        'minor': ['minor-drift', 'dorian-night', 'melancholy', 'descending', 'rain-minor', 'aeolian-walk']}
+MINOR = ('minor-drift', 'melancholy', 'rain-minor', 'aeolian-walk')   # named in A minor (dorian-night: D dorian)
 # keys = comp instrument, mel = lead instrument (GM programs), pad = 'saw' (DSP) or GM program
 PALETTES = {
     'rhodes-piano': dict(keys=4, mel=0, pad='saw', bright=(0.0, 1.0), energy=(0.0, 1.0), tags=['rhodes', 'warm']),
@@ -40,21 +52,33 @@ PALETTES = {
     'rhodes-guitar': dict(keys=4, mel=24, pad='saw', bright=(0.0, 0.6), energy=(0.0, 0.8), tags=['guitar', 'warm']),
     'piano-musicbox': dict(keys=0, mel=10, pad=89, bright=(0.0, 0.5), energy=(0.0, 0.45), tags=['musicbox', 'soft', 'dream']),
     'rhodes-choir': dict(keys=4, mel=0, pad=52, bright=(0.0, 0.55), energy=(0.0, 0.6), tags=['choir', 'dream', 'soft']),
+    # added 2026-11 (FluidR3 GM): muted trumpet, clarinet, marimba, kalimba, jazz guitar
+    'rhodes-trumpet': dict(keys=4, mel=59, pad='saw', bright=(0.2, 0.75), energy=(0.3, 1.0), tags=['trumpet', 'jazz', 'warm']),
+    'piano-clarinet': dict(keys=0, mel=71, pad='saw', bright=(0.0, 0.6), energy=(0.0, 0.7), tags=['clarinet', 'warm', 'soft']),
+    'guitar-marimba': dict(keys=24, mel=12, pad='saw', bright=(0.45, 1.0), energy=(0.35, 1.0), tags=['guitar', 'marimba']),
+    'piano-kalimba': dict(keys=0, mel=108, pad=89, bright=(0.3, 0.9), energy=(0.0, 0.55), tags=['kalimba', 'musicbox', 'soft']),
+    'jazzguitar-vibes': dict(keys=26, mel=11, pad='saw', bright=(0.3, 0.85), energy=(0.25, 0.9), tags=['guitar', 'vibes', 'jazz']),
 }
 FORMS = {
     'classic': ['intro'] * 4 + ['A'] * 8 + ['B'] * 8 + ['brk'] * 4 + ['A2'] * 8 + ['out'] * 4,
     'straight': ['intro'] * 4 + ['A'] * 8 + ['B'] * 8 + ['A2'] * 8 + ['out'] * 4,
     'long': ['intro'] * 4 + ['A'] * 8 + ['B'] * 8 + ['brk'] * 4 + ['A2'] * 8 + ['B2'] * 8 + ['out'] * 4,
 }
-KICKS = [([0, 1.75, 2.5], [0, 2.5, 3.25]), ([0, 2.5], [0, 1.5, 2.5]), ([0, 0.75, 2.5], [0, 2.25, 2.75])]
-COMPS = [[(0, 1.6, 60), (2.5, 1.2, 50)], [(0, 1.0, 58), (1.5, 0.5, 46), (2.5, 1.4, 52)], [(0, 2.4, 58), (3.5, 0.5, 48)]]
+KICKS = [([0, 1.75, 2.5], [0, 2.5, 3.25]), ([0, 2.5], [0, 1.5, 2.5]), ([0, 0.75, 2.5], [0, 2.25, 2.75]),
+         ([0, 1.5, 2.5], [0, 0.75, 2.5, 3.5])]
+COMPS = [[(0, 1.6, 60), (2.5, 1.2, 50)], [(0, 1.0, 58), (1.5, 0.5, 46), (2.5, 1.4, 52)], [(0, 2.4, 58), (3.5, 0.5, 48)],
+         [(0, 0.6, 56), (0.75, 0.5, 46), (2, 1.6, 54)]]
 BASSLINES = [lambda i: [(0, 0, 1.4), (2.5, 7 if i % 2 else 0, 0.6), (3.5, 12 if i % 2 else -2, 0.4)],
              lambda i: [(0, 0, 2.3), (3, 7, 0.8)],
-             lambda i: [(0, 0, 1.4), (1.75, 0, 0.4), (2.5, 7, 1.2)]]
+             lambda i: [(0, 0, 1.4), (1.75, 0, 0.4), (2.5, 7, 1.2)],
+             lambda i: [(0, 0, 0.9), (1, 12, 0.4), (2.5, 7, 0.8), (3.5, 0 if i % 2 else 12, 0.4)]]
 RHYTHMS = [[(0, 1), (1, .5), (1.5, 1), (3, 1)], [(0.5, .5), (1, .5), (1.5, 1.5), (3.5, .5)],
            [(0, 1.5), (1.5, .5), (2, 1), (3, 1)], [(0, .5), (.5, .5), (1, 1), (2, .5), (2.5, 1.5)],
-           [(0, 2), (2, 1), (3, 1)], [(1, .5), (1.5, .5), (2, 2)], [(0, 1), (1.5, .5), (2, .5), (2.5, 1.5)]]
-SLOW_RHYTHMS = [[(0, 2), (2, 1), (3, 1)], [(0, 1.5), (1.5, .5), (2, 2)], [(1, 1), (2, 2)], [(0, 3), (3, 1)]]
+           [(0, 2), (2, 1), (3, 1)], [(1, .5), (1.5, .5), (2, 2)], [(0, 1), (1.5, .5), (2, .5), (2.5, 1.5)],
+           [(0.5, 1), (1.5, .5), (2, 1.5), (3.5, .5)], [(0, .5), (.5, 1), (2, .5), (2.5, .5), (3, 1)],
+           [(0, 1.5), (2, .5), (2.5, 1.5)], [(.5, .5), (1, .5), (1.5, .5), (2, 2)]]
+SLOW_RHYTHMS = [[(0, 2), (2, 1), (3, 1)], [(0, 1.5), (1.5, .5), (2, 2)], [(1, 1), (2, 2)], [(0, 3), (3, 1)],
+                [(0, 2), (2, 2)], [(0.5, 1.5), (2, 2)]]
 ENDINGS = [[(0, 3)], [(0, 2), (2, 1.5)], [(0.5, .5), (1, 2.5)]]
 PENT = [0, 2, 4, 7, 9]   # C major / A minor pentatonic (relative to key)
 SCALE = [0, 2, 4, 5, 7, 9, 11]
@@ -119,7 +143,7 @@ def render(p, out_path):
     for i, sc in enumerate(sect):
         root, ch = prog[i % 8]
         hits = COMPS[p['comp']] if sc != 'brk' else [(0, 3.8, 52)]
-        strum = 0.03 if pal['keys'] == 24 else 0.018
+        strum = 0.03 if pal['keys'] in (24, 25, 26) else 0.018
         for pos, l, v in hits:
             for j, pp in enumerate(ch):
                 keys.append((pp, T(i, pos) + j * strum + random.uniform(0, 0.01), l * b, v + random.randint(-6, 6)))
@@ -173,4 +197,4 @@ def render(p, out_path):
     master(mix, out_path, lufs=LUFS)
     melody_events = [dict(pitch=x[0], start=x[1], dur=x[2]) for x in mel]
     return dict(lufs_target=LUFS, beat=b, key_pcs=sorted((x + k) % 12 for x in SCALE),
-                chords=score, melody=melody_events, key_name=(key_name(k, 'A') + 'm') if p['prog'] in ('minor-drift', 'melancholy') else (key_name(k, 'D') + ' dorian' if p['prog'] == 'dorian-night' else key_name(k, 'C')), bars=bars)
+                chords=score, melody=melody_events, key_name=(key_name(k, 'A') + 'm') if p['prog'] in MINOR else (key_name(k, 'D') + ' dorian' if p['prog'] == 'dorian-night' else key_name(k, 'C')), bars=bars)

@@ -1,6 +1,6 @@
 ---
 name: instrumental-music
-description: 외부 생성형 음악 AI(Suno 등) 없이 코드만으로 로우파이(lo-fi hip hop)·뉴에이지(ambient piano) instrumental 트랙을 만든다. 무드를 말로 주면("비 오는 새벽, 쓸쓸한데 따뜻하게") 템포·장단조·악기 팔레트·빗소리 같은 질감으로 바꿔 생성하고, 자동 품질 검사(LUFS·피크·스펙트럼·화성 충돌) 통과작 중 최고를 고른다. seed로 재현. "로우파이 만들어줘", "뉴에이지 곡", "이런 분위기 BGM", "instrumental 음악 생성", "seed 42로 다시" 같은 요청이면 이 스킬을 쓴다.
+description: 외부 생성형 음악 AI(Suno 등) 없이 코드만으로 로우파이(lo-fi hip hop)·뉴에이지(ambient piano)·재즈 트리오·칩튠 instrumental 트랙을 만든다. 무드를 말로 주면("비 오는 새벽, 쓸쓸한데 따뜻하게") 템포·장단조·악기 팔레트·빗소리 같은 질감으로 바꿔 생성하고, 자동 품질 검사(LUFS·피크·스펙트럼·화성 충돌) 통과작 중 최고를 고른다. seed로 재현. "로우파이 만들어줘", "뉴에이지 곡", "재즈", "칩튠", "이런 분위기 BGM", "instrumental 음악 생성", "seed 42로 다시" 같은 요청이면 이 스킬을 쓴다.
 ---
 
 # instrumental-music
@@ -40,6 +40,7 @@ python3 make.py --genre newage --mood-set energy=0.2 brightness=0.7 texture=bird
 ```
 
 출력: `<genre>_<seed>.mp3`, `<genre>_<seed>.json`(plan·QC 지표·악보 요약), `report.json`(통과 여부·점수순). 3변주 기준 약 30-60초(병렬 렌더).
+mp3는 기본 224k. 스트리밍처럼 용량이 중요하면 `--bitrate 128k`(또는 `MUSIC_BITRATE=128k`). 곡은 같고 파일만 작아진다.
 
 요청 처리 순서:
 1. **무드가 있으면 무드부터.** 원문을 `--mood`로 넘기고, 사전에 없을 법한 표현이면 [references/moods.md](references/moods.md)를 보고 `--mood-set`으로 축(energy, brightness, mode, space, texture, palette)을 직접 정한다. 출력의 `mood:` 줄이 의도와 맞는지 확인한다.
@@ -55,15 +56,28 @@ python3 make.py --genre newage --mood-set energy=0.2 brightness=0.7 texture=bird
 **lofi** (`presets/lofi.py`, -14 LUFS)
 - `prog`: `ii-V-I-vi`(Rainy Window), `descending`, `minor-drift`, `neo-soul`
 - `form`: `classic`(intro4 A8 B8 break4 A'8 out4), `straight`, `long`
-- `prog` 추가: `dorian-night`, `melancholy`, `sunlit`
-- `palette`: `rhodes-piano`, `piano-vibes`, `guitar-flute`, `rhodes-guitar`, `piano-musicbox`, `rhodes-choir`
-- `bpm` 66-88(energy), `swing` 0.05-0.09, `key` -4..+3 (C 기준), `kick`/`comp`/`bassline` 0-2, `texture`
+- `prog` 추가: `dorian-night`, `melancholy`, `sunlit`, `four-chord`, `royal-road`, `backdoor`, `rain-minor`, `aeolian-walk`
+- `palette`: `rhodes-piano`, `piano-vibes`, `guitar-flute`, `rhodes-guitar`, `piano-musicbox`, `rhodes-choir`, `rhodes-trumpet`, `piano-clarinet`, `guitar-marimba`, `piano-kalimba`, `jazzguitar-vibes`
+- `bpm` 66-88(energy), `swing` 0.05-0.09, `key` -4..+3 (C 기준), `kick`/`comp`/`bassline` 0-3, `texture`
 
 **newage** (`presets/newage.py`, Tidewater와 같은 -16 LUFS 설정, 실측 약 -15)
-- `pair`: 진행 두 개 조합 (tide/drift/dusk/lift/open/nocturne/lament/morning)
-- `palette`: `piano-strings`, `piano-choir`, `harp-flute`, `guitar-piano`, `celesta-piano`, `piano-pad`
+- `pair`: 진행 두 개 조합 (tide/drift/dusk/lift/open/nocturne/lament/morning/glow/plateau/horizon/ember/hollow)
+- `palette`: `piano-strings`, `piano-choir`, `harp-flute`, `guitar-piano`, `celesta-piano`, `piano-pad`, `rhodes-flute`, `piano-oboe`, `harp-clarinet`, `guitar-flute`, `harp-vibes`
 - `form`: `classic`(intro4 A8 B8 C8 out4), `short`, `return`
-- `bpm` 56-76(energy), `key` -3..+3 (D 기준), `arp` 0-2, `texture`(기본 ocean)
+- `bpm` 56-76(energy), `key` -3..+3 (D 기준), `arp` 0-4, `texture`(기본 ocean)
+
+**jazz** (`presets/jazz.py`, -15 LUFS, 초안: 레퍼런스 곡 승인 전)
+- 스윙 8분, 피아노 rootless comping, 콘트라베이스 워킹(코드 첫 박 근음, 마지막 박 반음/5도 접근음), 브러시 킷(GM 40)
+- `prog`(head): `two-five`, `rhythm`, `backdoor`, `turnaround` / minor `falling-leaves`, `minor-blue`. bridge는 head에 맞춰 정해짐
+- `palette`: `piano-trio`, `vibes-trio`, `tenor-quartet`, `trumpet-quartet`, `guitar-trio`
+- `form`: `standard`(intro4 A8 A8 B8 A8 피아노솔로8 A8 out4), `long`(솔로 16)
+- `bpm` 92-140(energy), `swing` 0.12-0.16, `brushes` swirl(energy<0.4)/ride, `texture`(기본 none)
+
+**chiptune** (`presets/chiptune.py`, -14 LUFS, 초안: 레퍼런스 곡 승인 전)
+- 전부 DSP: 사각파 리드(늦게 걸리는 vibrato + 3/4박 echo), 사각파 아르페지오, 4bit 삼각파 베이스, 노이즈 드럼. 고음은 low-pass로 깎는다
+- `pair`: hero/town/sky/mixo, minor cave/quest
+- `form`: `classic`, `long`, `lead_duty`·`arp_duty` 0.125-0.5, `arp_rate` 4/6, `bassline` octave/root-fifth/pulse
+- `bpm` 96-140(energy), `half_time`(energy<0.3)
 
 ## 품질 검사 (`scripts/qc.py`)
 
@@ -71,7 +85,7 @@ python3 make.py --genre newage --mood-set energy=0.2 brightness=0.7 texture=bird
 
 | 체크 | 기준 |
 |---|---|
-| loudness | integrated LUFS가 장르 목표 ±1 LU (lofi -14, newage -15) |
+| loudness | integrated LUFS가 장르 목표 ±1 LU (lofi -14, newage -15, jazz -15, chiptune -14) |
 | true_peak | ≤ -0.1 dBTP (4x oversampling) |
 | clipping | full scale 샘플 < 0.001% |
 | silence | 곡 본문에 2초 넘는 -50 dBFS 이하 구간 없음 |
@@ -80,7 +94,7 @@ python3 make.py --genre newage --mood-set energy=0.2 brightness=0.7 texture=bird
 | spectrum | low/mid/high 에너지 비율이 장르 창 안 |
 | harmony | 멜로디의 코드 반음 충돌 ≤ 8%, 키 밖 음 ≤ 5% |
 
-창은 두 레퍼런스 실측값에 여유를 둬서 정했다. 값과 근거는 [references/quality-bar.md](references/quality-bar.md). 점수(0-100)는 통과한 변주끼리 순위를 매기는 용도다. **QC는 기술적 결함을 거르는 장치지 귀를 대신하지 않는다.** 사용자 피드백으로 기준이 바뀌면 quality-bar.md와 `PROFILES`를 같이 고친다.
+창은 두 레퍼런스 실측값에 여유를 둬서 정했다. jazz·chiptune은 레퍼런스 곡이 승인되기 전이라 창을 넓게 둔 초안이다. 값과 근거는 [references/quality-bar.md](references/quality-bar.md). 점수(0-100)는 통과한 변주끼리 순위를 매기는 용도다. **QC는 기술적 결함을 거르는 장치지 귀를 대신하지 않는다.** 사용자 피드백으로 기준이 바뀌면 quality-bar.md와 `PROFILES`를 같이 고친다.
 
 ## preset 추가 / 수정
 
@@ -91,4 +105,4 @@ python3 make.py --genre newage --mood-set energy=0.2 brightness=0.7 texture=bird
 ## 알려진 약점
 
 - 피아노 음색은 FluidR3 GM 수준. 더 좋은 SoundFont(예: Salamander Grand, GeneralUser GS)를 `MUSIC_SF2`로 지정하면 엔진 수정 없이 바뀐다. 바꾼 뒤엔 레퍼런스 QC를 다시 본다.
-- 장르는 두 개뿐. 질감은 6종(vinyl, rain, fire, birds, night, ocean). 곡 길이는 약 2-2.5분(`form=long`/`return`으로 조금 더 길게).
+- 장르는 네 개(jazz·chiptune은 초안). 질감은 6종(vinyl, rain, fire, birds, night, ocean). 곡 길이는 약 2-2.5분(`form=long`/`return`으로 조금 더 길게).

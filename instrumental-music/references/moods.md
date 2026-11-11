@@ -18,17 +18,19 @@
 | `texture` | vinyl, rain, fire, birds, night, ocean, none | 배경 질감 (lofi는 바이닐이 항상 옅게 깔림) |
 | `palette` | 아래 표 | 악기 조합 (생략하면 energy·brightness·힌트로 고름) |
 | `prog` | lofi 진행 이름 | 진행 고정 |
-| `genre` | lofi / newage | `--genre auto`일 때 장르 |
+| `genre` | lofi / newage / jazz / chiptune | `--genre auto`일 때 장르 |
 
 ## 팔레트
 
-**lofi**: `rhodes-piano`(Rainy Window), `piano-vibes`, `guitar-flute`(나일론 기타 comp + 플루트, warm pad), `rhodes-guitar`, `piano-musicbox`(오르골 멜로디), `rhodes-choir`(choir pad)
+**lofi**: `rhodes-piano`(Rainy Window), `piano-vibes`, `guitar-flute`(나일론 기타 comp + 플루트, warm pad), `rhodes-guitar`, `piano-musicbox`(오르골 멜로디), `rhodes-choir`(choir pad), `rhodes-trumpet`(뮤트 트럼펫), `piano-clarinet`, `guitar-marimba`, `piano-kalimba`, `jazzguitar-vibes`
 
-**newage**: `piano-strings`(Tidewater), `piano-choir`, `harp-flute`, `guitar-piano`, `celesta-piano`, `piano-pad`
+**newage**: `piano-strings`(Tidewater), `piano-choir`, `harp-flute`, `guitar-piano`, `celesta-piano`, `piano-pad`, `rhodes-flute`, `piano-oboe`(목가적), `harp-clarinet`, `guitar-flute`, `harp-vibes`
 
-**lofi 진행**: major `ii-V-I-vi` `neo-soul` `sunlit` `descending` / minor `minor-drift` `dorian-night` `melancholy` `descending`
+**lofi 진행**: major `ii-V-I-vi` `neo-soul` `sunlit` `descending` `four-chord` `royal-road` `backdoor` / minor `minor-drift` `dorian-night` `melancholy` `descending` `rain-minor` `aeolian-walk`
 
-**newage 진행 쌍**: major tide·drift·lift·open·morning / minor dusk·nocturne·lament
+**jazz**: `piano-trio`, `vibes-trio`, `tenor-quartet`(테너 색소폰), `trumpet-quartet`(뮤트 트럼펫), `guitar-trio`. chiptune은 팔레트 없음(음색 고정)
+
+**newage 진행 쌍**: major tide·drift·lift·open·morning·glow·plateau·horizon / minor dusk·nocturne·lament·ember·hollow
 
 ## 예시 해석
 
