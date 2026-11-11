@@ -5,6 +5,8 @@
   python make.py --genre newage --seed 4242             # reproduce exactly
   python make.py --genre rainy-window                   # approved reference tracks
   python make.py --genre lofi --seed 7 --variants 1 --set bpm=76 key=2 prog=descending
+  python make.py --mood "비 오는 새벽, 쓸쓸한데 따뜻하게" --variants 3   # genre inferred from mood
+  python make.py --genre newage --mood-set energy=0.2 brightness=0.7 texture=birds palette=harp-flute
 
 Each variant: plan(seed) -> render -> qc. A failing variant is regenerated with
 seed+1000 (deterministic) up to --tries times. Output per variant:
@@ -40,14 +42,15 @@ def parse_set(items):
     return out
 
 
-def one(genre, seed, outdir, tries, overrides, keep_wav):
+def one(genre, seed, outdir, tries, overrides, keep_wav, mood=None):
     import qc
     mod_name, profile = GENRES[genre]
     mod = importlib.import_module(mod_name)
     attempts = []
     s = seed
     for t in range(tries):
-        p = mod.plan(s); p.update(overrides)
+        p = mod.plan(s, mood) if mood is not None and not mod_name.endswith(('rainy_window', 'tidewater')) else mod.plan(s)
+        p.update(overrides)
         base = os.path.join(outdir, f"{genre}_{p['seed']}")
         t0 = time.time()
         score = mod.render(p, base)
@@ -70,7 +73,9 @@ def one(genre, seed, outdir, tries, overrides, keep_wav):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('--genre', required=True, choices=list(GENRES))
+    ap.add_argument('--genre', default='auto', choices=['auto'] + list(GENRES))
+    ap.add_argument('--mood', help='free-text mood (Korean/English), mapped by moods.py')
+    ap.add_argument('--mood-set', nargs='*', help='explicit mood axes: energy= brightness= mode= space= texture= palette= prog=')
     ap.add_argument('--seed', type=int, help='base seed (default: random). Same seed -> same track')
     ap.add_argument('--variants', type=int, default=1)
     ap.add_argument('--tries', type=int, default=4, help='regeneration attempts per variant on QC failure')
@@ -83,20 +88,28 @@ def main():
     base = a.seed if a.seed is not None else random.randrange(1, 100000)
     seeds = [base + i for i in range(a.variants)]
     ov = parse_set(a.set)
+    import moods
+    mood = None
+    if a.mood or a.mood_set:
+        mood = moods.from_args(a.mood, parse_set(a.mood_set))
+        print('mood:', json.dumps({k: v for k, v in mood.items() if v not in (None, [])}, ensure_ascii=False), flush=True)
+    if a.genre == 'auto':
+        a.genre = (mood or {}).get('genre') or 'lofi'
     print(f"genre={a.genre} seeds={seeds}", flush=True)
     with ProcessPoolExecutor(max_workers=max(1, min(a.jobs, len(seeds)))) as ex:
         results = list(ex.map(one, [a.genre] * len(seeds), seeds, [a.out] * len(seeds), [a.tries] * len(seeds),
-                              [ov] * len(seeds), [a.keep_wav] * len(seeds)))
+                              [ov] * len(seeds), [a.keep_wav] * len(seeds), [mood] * len(seeds)))
     results.sort(key=lambda r: (r['qc']['passed'], r['qc']['score']), reverse=True)
     report = [dict(rank=i + 1, mp3=r['mp3'], seed=r['seed'], passed=r['qc']['passed'], score=r['qc']['score'],
-                   key=r['key'], plan=r['plan'], attempts=r['attempts'],
+                   key=r['key'], palette=r['plan'].get('palette'), texture=r['plan'].get('texture'),
+                   bpm=r['plan'].get('bpm'), prog=r['plan'].get('prog') or r['plan'].get('pair'), plan=r['plan'], attempts=r['attempts'],
                    lufs=r['qc']['metrics']['lufs'], duration_s=round(r['qc']['metrics']['duration_s'], 1))
               for i, r in enumerate(results)]
     json.dump(report, open(os.path.join(a.out, 'report.json'), 'w'), indent=1)
     for r in report:
         flag = 'PASS' if r['passed'] else 'FAIL'
         print(f"#{r['rank']} {flag} score={r['score']:5.1f} seed={r['seed']} key={r['key']} "
-              f"{r['duration_s']}s  {r['mp3']}  tries={len(r['attempts'])}")
+              f"{r['bpm']}bpm {r['palette']} {r['texture']} {r['duration_s']}s  {r['mp3']}  tries={len(r['attempts'])}")
     sys.exit(0 if any(r['passed'] for r in report) else 1)
 
 

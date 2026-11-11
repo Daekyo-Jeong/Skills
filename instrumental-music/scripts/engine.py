@@ -166,3 +166,65 @@ def rms_db(x):
 def to_db(x, target):
     """scale stem so its RMS over active samples equals target dBFS"""
     return x * 10 ** ((target - rms_db(x)) / 20)
+
+
+# ---------- ambience textures (mood layer) ----------
+def _impulses(n, per_sec, amp=(0.2, 1.0)):
+    x = np.zeros(n); k = int(n / SR * per_sec)
+    idx = rng.integers(0, n, k); x[idx] = rng.uniform(*amp, k) * rng.choice([-1, 1], k)
+    return x
+
+
+def rain(n, heavy=0.5):
+    """Steady rain on a window: broadband wash + droplets + low rumble (stereo)."""
+    t = np.arange(n) / SR
+    out = np.zeros((n, 2))
+    for c in range(2):
+        wash = bp(rng.standard_normal(n), 500, 9000, 2) * (0.7 + 0.3 * np.sin(2 * np.pi * 0.03 * t + c))
+        drops = bp(fftconvolve(_impulses(n, 25 + 40 * heavy), np.exp(-np.arange(int(0.012 * SR)) / (0.002 * SR)))[:n], 1500, 7000, 2)
+        rumble = lp(rng.standard_normal(n), 250, 2) * 0.6
+        out[:, c] = wash * 0.25 + drops * 1.2 + rumble * heavy
+    return out * 0.1
+
+
+def fire(n):
+    """Fireplace: low roar + crackles."""
+    t = np.arange(n) / SR
+    roar = lp(rng.standard_normal(n), 180, 2) * (0.6 + 0.4 * np.sin(2 * np.pi * 0.11 * t) ** 2)
+    pops = _impulses(n, 9, (0.1, 1.0))
+    crack = bp(fftconvolve(pops, np.exp(-np.arange(int(0.02 * SR)) / (0.003 * SR)))[:n], 900, 6000, 2)
+    return np.stack([roar * 0.5 + crack, roar * 0.5 + np.roll(crack, int(0.004 * SR))], 1) * 0.1
+
+
+def birds(n, rate=0.25):
+    """Sparse songbird chirps (FM sweeps), randomly panned."""
+    out = np.zeros((n, 2)); t0 = 1.0
+    while t0 < n / SR - 2:
+        f0 = rng.uniform(2300, 3600); m = int(rng.integers(2, 6))
+        for j in range(m):
+            d = rng.uniform(0.05, 0.12); k = int(d * SR); tt = np.arange(k) / SR
+            f = f0 * (1 + rng.uniform(0.2, 0.6) * tt / d) * (1 + 0.03 * np.sin(2 * np.pi * 60 * tt))
+            ch = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.sin(np.pi * tt / d) ** 2
+            place(out, ch * 0.3, t0 + j * rng.uniform(0.12, 0.2), 1.0, rng.uniform(0.15, 0.85))
+        t0 += rng.exponential(1 / rate) + 0.8
+    return lp(out, 7000)
+
+
+def night(n):
+    """Summer night: two crickets + faint air."""
+    t = np.arange(n) / SR
+    out = np.zeros((n, 2))
+    for f, pr, ph, p in ((4400, 1.3, 0, 0.3), (4900, 1.7, 0.6, 0.75)):
+        gate = (np.sin(2 * np.pi * 32 * t) > 0.2) * ((t * pr + ph) % 1 < 0.35)
+        x = np.sin(2 * np.pi * f * t) * lp(gate.astype(float), 400)
+        out += pan(x * 0.15, p)
+    air = st(lp(rng.standard_normal(n), 600)) * 0.08
+    return out + air
+
+
+def texture(name, n):
+    if name in (None, 'none'):
+        return np.zeros((n, 2))
+    return {'vinyl': lambda: st(vinyl(n, 5)), 'rain': lambda: rain(n), 'fire': lambda: fire(n),
+            'birds': lambda: birds(n), 'night': lambda: night(n),
+            'ocean': lambda: st(wind(n, 150, 700))}[name]()

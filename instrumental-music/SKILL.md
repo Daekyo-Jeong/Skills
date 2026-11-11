@@ -1,6 +1,6 @@
 ---
 name: instrumental-music
-description: 외부 생성형 음악 AI(Suno 등) 없이 코드만으로 로우파이(lo-fi hip hop)·뉴에이지(ambient piano) instrumental 트랙을 만든다. 품질이 검증된 장르 preset + seed 재현 + 자동 품질 검사(LUFS·피크·클리핑·스펙트럼·다이내믹·화성 충돌) + 변주 N개 중 최고 선택. "로우파이 만들어줘", "뉴에이지 곡", "BGM 만들어", "instrumental 음악 생성", "lofi 트랙", "seed 42로 다시" 같은 요청이면 이 스킬을 쓴다.
+description: 외부 생성형 음악 AI(Suno 등) 없이 코드만으로 로우파이(lo-fi hip hop)·뉴에이지(ambient piano) instrumental 트랙을 만든다. 무드를 말로 주면("비 오는 새벽, 쓸쓸한데 따뜻하게") 템포·장단조·악기 팔레트·빗소리 같은 질감으로 바꿔 생성하고, 자동 품질 검사(LUFS·피크·스펙트럼·화성 충돌) 통과작 중 최고를 고른다. seed로 재현. "로우파이 만들어줘", "뉴에이지 곡", "이런 분위기 BGM", "instrumental 음악 생성", "seed 42로 다시" 같은 요청이면 이 스킬을 쓴다.
 ---
 
 # instrumental-music
@@ -16,7 +16,7 @@ Python MIDI(FluidSynth) + numpy DSP **hybrid 엔진**으로 곡을 렌더한다.
 
 ## 원칙
 
-1. **sound chain은 고정, 작곡만 바꾼다.** 음색·이펙트 체인·stem 레벨·마스터 LUFS는 레퍼런스와 동일한 코드다. seed가 바꾸는 건 키, 템포, 스윙, 코드 진행(큐레이션된 bank), 곡 구조, 그루브, 멜로디뿐이다. 품질을 깨는 변수는 애초에 노출하지 않는다.
+1. **처리 체인은 고정, 고르는 건 검증된 bank 안에서만.** 이펙트 체인 구조·stem 레벨 비율·마스터 LUFS는 레퍼런스와 같은 코드다. 무드와 seed가 바꾸는 건 키, 템포, 진행, 구조, 그루브, 악기 팔레트, 배경 질감, 필터 밝기, 공간감, 멜로디이고 전부 QC 통과를 확인한 후보 목록에서 고른다. 품질을 깨는 자유 변수는 노출하지 않는다.
 2. **멜로디는 규칙으로 만든다.** 펜타토닉 안에서, 강박·긴 음은 코드톤, 경과음은 순차진행이고 코드와 반음 충돌 금지. 1-2마디 motif를 5-6마디에서 반복, 4·8마디는 긴 cadence.
 3. **같은 seed = 같은 곡** (디코딩된 PCM md5까지 동일 확인). 마음에 든 곡은 seed만 기록하면 된다.
 4. **QC 통과 못 하면 버린다.** 실패한 변주는 seed+1000으로 자동 재생성(기본 4회).
@@ -35,27 +35,35 @@ python3 make.py --genre lofi --variants 3 --out ~/Music/claude      # 변주 3�
 python3 make.py --genre newage --variants 3 --out ~/Music/claude
 python3 make.py --genre lofi --seed 102 --out out                    # 특정 곡 재현
 python3 make.py --genre lofi --seed 7 --set bpm=76 key=2 prog=descending   # plan 일부 고정
+python3 make.py --mood "비 오는 새벽, 쓸쓸한데 따뜻하게" --variants 3 --out out     # 무드 → 장르·설정 자동
+python3 make.py --genre newage --mood-set energy=0.2 brightness=0.7 texture=birds palette=harp-flute
 ```
 
 출력: `<genre>_<seed>.mp3`, `<genre>_<seed>.json`(plan·QC 지표·악보 요약), `report.json`(통과 여부·점수순). 3변주 기준 약 30-60초(병렬 렌더).
 
 요청 처리 순서:
-1. 장르를 lofi / newage 중 고른다. 둘 다 아니면 가장 가까운 쪽을 쓰고 그렇게 말한다(새 장르는 아래 "preset 추가").
-2. `--variants 3`으로 돌린다. 분위기 요청(밝게, 느리게, 짧게)은 `--set`으로 반영한다: `bpm`, `key`(반음 offset), `prog`, `form`.
-3. `report.json` 1위를 기본 추천으로, 나머지도 같이 전달한다. seed를 반드시 함께 알려준다.
-4. 사용자가 고른 곡은 seed로 언제든 재현된다.
+1. **무드가 있으면 무드부터.** 원문을 `--mood`로 넘기고, 사전에 없을 법한 표현이면 [references/moods.md](references/moods.md)를 보고 `--mood-set`으로 축(energy, brightness, mode, space, texture, palette)을 직접 정한다. 출력의 `mood:` 줄이 의도와 맞는지 확인한다.
+2. 장르는 무드에서 추론된다(명상·바다·몽환 → newage, 그 외 lofi). 사용자가 장르를 말하면 `--genre`로 고정. 둘 다 아니면 가장 가까운 쪽을 쓰고 그렇게 말한다.
+3. `--variants 3`으로 돌린다. 세부 지시(더 느리게, 키 올려)는 `--set`으로: `bpm`, `key`(반음 offset), `prog`, `form`, `palette`, `texture`.
+4. `report.json` 1위를 기본 추천으로, 나머지도 같이 전달한다. seed와 무드 설정을 함께 알려준다.
+5. 사용자가 고른 곡은 같은 seed + 같은 무드 설정으로 언제든 재현된다.
 
 ## preset 선택지
+
+무드 축·팔레트·질감 전체 목록과 해석 예시는 [references/moods.md](references/moods.md).
 
 **lofi** (`presets/lofi.py`, -14 LUFS)
 - `prog`: `ii-V-I-vi`(Rainy Window), `descending`, `minor-drift`, `neo-soul`
 - `form`: `classic`(intro4 A8 B8 break4 A'8 out4), `straight`, `long`
-- `bpm` 70-82, `swing` 0.05-0.09, `key` -4..+3 (C 기준), `kick`/`comp`/`bassline` 0-2, `keys_prog` 4=Rhodes 0=piano, `mel_prog` 0=piano 11=vibes, `vinyl` 4-7
+- `prog` 추가: `dorian-night`, `melancholy`, `sunlit`
+- `palette`: `rhodes-piano`, `piano-vibes`, `guitar-flute`, `rhodes-guitar`, `piano-musicbox`, `rhodes-choir`
+- `bpm` 66-88(energy), `swing` 0.05-0.09, `key` -4..+3 (C 기준), `kick`/`comp`/`bassline` 0-2, `texture`
 
 **newage** (`presets/newage.py`, Tidewater와 같은 -16 LUFS 설정, 실측 약 -15)
-- `pair` 0-4: 진행 두 개 조합 (tide/drift/dusk/lift/open)
+- `pair`: 진행 두 개 조합 (tide/drift/dusk/lift/open/nocturne/lament/morning)
+- `palette`: `piano-strings`, `piano-choir`, `harp-flute`, `guitar-piano`, `celesta-piano`, `piano-pad`
 - `form`: `classic`(intro4 A8 B8 C8 out4), `short`, `return`
-- `bpm` 60-72, `key` -3..+3 (D 기준), `arp` 0-2
+- `bpm` 56-76(energy), `key` -3..+3 (D 기준), `arp` 0-2, `texture`(기본 ocean)
 
 ## 품질 검사 (`scripts/qc.py`)
 
@@ -83,4 +91,4 @@ python3 make.py --genre lofi --seed 7 --set bpm=76 key=2 prog=descending   # pla
 ## 알려진 약점
 
 - 피아노 음색은 FluidR3 GM 수준. 더 좋은 SoundFont(예: Salamander Grand, GeneralUser GS)를 `MUSIC_SF2`로 지정하면 엔진 수정 없이 바뀐다. 바꾼 뒤엔 레퍼런스 QC를 다시 본다.
-- 장르는 두 개뿐. 곡 길이는 약 2-2.5분(`form=long`/`return`으로 조금 더 길게).
+- 장르는 두 개뿐. 질감은 6종(vinyl, rain, fire, birds, night, ocean). 곡 길이는 약 2-2.5분(`form=long`/`return`으로 조금 더 길게).
