@@ -16,6 +16,7 @@ Claude Code에서 쓰는 개인 스킬 모음. 각 폴더가 스킬 하나이며
 | [**boardgame-port**](./boardgame-port) | 보드게임을 dkdk-arcade 웹 게임으로 이식하는 리츄얼 — 공식 룰 원문·카드 이미지 확보 → 리스킨 대응표 → 정보 등가성 → 모바일 조작 규칙 → 퍼즈/봇 검증 → 배포. |
 | [**didi**](./didi) | dkdk 도트 마스코트 디디(네온 초록 바다코끼리)의 원본 그림·팔레트·모션과 그리는 도구. 몸은 새로 그리지 않고 `didi.json`에서 꺼내 쓰며, 형태 규칙(정면을 밀어낸 판, 반측면까지만)과 검사를 함께 담았다. 원본 작업장은 dkdk-mov. |
 | [**dkdk-design**](./dkdk-design) | dkdk 서비스 공통 디자인 시스템. 메인·feed에서 추출한 색(종이·잉크·그린=시스템·핑크=사람), 글꼴(Pretendard + IBM Plex Mono), 간격·모서리·모션 토큰과 컴포넌트 패턴, 새 서비스용 최소 토큰 CSS. |
+| [**instrumental-music**](./instrumental-music) | 외부 음악 AI 없이 코드로 로우파이·뉴에이지 instrumental 트랙 생성. FluidSynth MIDI + numpy DSP hybrid 엔진, 승인된 레퍼런스 품질로 고정한 장르 preset, seed 재현, 자동 품질 검사(LUFS·피크·스펙트럼·화성) 후 미달 시 재생성, 변주 N개 중 최고 선택. |
 
 ## 설치
 
