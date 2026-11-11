@@ -21,6 +21,7 @@ The first attached image is the official reference drawing. The second is his mo
 - Brow: 2-3 short frown lines between the eyebrows.
 - Facial hair: drooping mustache thin in the middle, ends falling past the mouth corners; a small patch under the lower lip; a pointed downward-triangle chin beard filled dark with rough edges. No cheek beard, no sideburn beard.
 - Nose: wide nostrils, two dots, almost no bridge line. Mouth: small and closed, no teeth (only a laughing or crying expression may open it).
+- Earring: a small thin metal hoop earring (a simple ring about the size of the earlobe, one or two pencil strokes) on every visible earlobe. No other jewelry.
 - Clothing: plain crew-neck short-sleeve t-shirt, no logo or pattern.
 
 Line style:
