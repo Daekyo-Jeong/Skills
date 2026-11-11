@@ -64,16 +64,22 @@ LEXICON = [
 def parse(text):
     t = ' ' + text.lower() + ' '
     m = dict(DEFAULT); hints = []; hits = []
-    for words, adj in LEXICON:
-        if any(w in t for w in words):
-            hits.append(words[0])
-            for k, v in adj.items():
-                if k == 'palette_hint':
-                    hints.append(v)
-                elif isinstance(v, (int, float)) and k in ('energy', 'brightness', 'space'):
-                    m[k] += v
-                else:
-                    m[k] = v
+    # Apply matches in the order they appear in the text, so a later mention wins a conflict
+    # ("바다 여행 중 비 오는 밤" -> rain, not ocean). Lexicon order only breaks ties.
+    found = []
+    for i, (words, adj) in enumerate(LEXICON):
+        pos = [t.rfind(w) for w in words if w in t]
+        if pos:
+            found.append((max(pos), i, words, adj))
+    for _, _, words, adj in sorted(found, key=lambda f: f[:2]):
+        hits.append(words[0])
+        for k, v in adj.items():
+            if k == 'palette_hint':
+                hints.append(v)
+            elif isinstance(v, (int, float)) and k in ('energy', 'brightness', 'space'):
+                m[k] += v
+            else:
+                m[k] = v
     for k in ('energy', 'brightness', 'space'):
         m[k] = round(min(1.0, max(0.0, m[k])), 2)
     m['hints'] = hints
