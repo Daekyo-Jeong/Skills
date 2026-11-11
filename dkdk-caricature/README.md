@@ -17,8 +17,15 @@
 - `references/caption.md` — 캡션 문형과 손글씨 규칙 (선택)
 - `references/prompt-template.md` — 생성 프롬프트 (고정 아이덴티티 블록)
 - `references/qa-checklist.md` — 검수
-- `assets/reference-original.jpg` — 기준 원화 (생성 시 `-i` 첨부)
+- `assets/reference-original.jpg` — 기준 원화 (생성 시 첫 번째 `-i`)
+- `assets/model-sheet.jpg` — 모델시트: 턴어라운드 4 + 포즈 4 + 표정 5 (두 번째 `-i`)
+- `assets/expression-sheet.jpg` — 표정 시트 3×3: 무표정·음미·판단 / 미소·폭소·멋쩍음 / 글썽·오열·체념 (세 번째 `-i`)
 - `assets/examples/` — 테스트 1차 결과 3장(커피·코드 리뷰·영수증). 시각 캘리브레이션용, 구도 복제 금지
+
+## 모델시트
+
+![model sheet](assets/model-sheet.jpg)
+![expression sheet](assets/expression-sheet.jpg)
 
 ## 생성 백엔드
 

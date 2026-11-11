@@ -13,6 +13,11 @@ description: 대교 본인(사람 얼굴)을 흑연 연필 캐리커처로 그�
 
 정답지는 `assets/reference-original.jpg`(대교가 직접 그린 원화). 모든 생성에 `-i`로 첨부한다.
 
+모델시트 두 장(대교 확정 2026-11-11)도 함께 첨부한다.
+- `assets/model-sheet.jpg`: 턴어라운드 4(정면·3/4·측면·뒤) + 포즈 4(걷기·노트북·팔짱·가슴에 손) + 표정 5. 비율·각도·옷 기준.
+- `assets/expression-sheet.jpg`: 3×3 표정. 무표정·음미·판단 / 미소·폭소·멋쩍음 / 글썽·오열·체념. 표정 기준.
+- 머리는 윤곽과 결만 대충 그린다. 윗머리를 진하게 채우지 않는다(채움은 귀 뒤 옆머리만).
+
 `assets/examples/`는 통과한 생성 예시(선 질감·비율 참고용). 구도·소품을 베끼지 말 것.
 
 ## 먼저 읽을 레퍼런스
@@ -30,18 +35,19 @@ description: 대교 본인(사람 얼굴)을 흑연 연필 캐리커처로 그�
 
 ### 2. 생성 (easel 백엔드)
 
-dkdk-walrus와 같은 백엔드(easel의 gen.sh, Codex CLI, API 키 불필요). 원화를 반드시 `-i`로 첨부:
+dkdk-walrus와 같은 백엔드(easel의 gen.sh, Codex CLI, API 키 불필요). 원화와 모델시트 두 장을 `-i`로 첨부:
 
 ```bash
 GENSH="$(dirname "$(readlink -f "$(which easel)")")/scripts/gen.sh"
-REF="<이 스킬 폴더>/assets/reference-original.jpg"
-cat ./brief/<slug>.md | "$GENSH" ./runs/<slug>.png -i "$REF"
+A="<이 스킬 폴더>/assets"
+cat ./brief/<slug>.md | "$GENSH" ./runs/<slug>.png \
+  -i "$A/reference-original.jpg" -i "$A/model-sheet.jpg" -i "$A/expression-sheet.jpg"
 ```
 
 - 장당 60–110초. 반드시 `run_in_background`로.
 - 여러 시안이 필요하면 `easel start ./brief/<slug>.md`(발산 N장) → `easel continue --pick <n>`.
-- 수정: `-i "$REF" -i <직전결과.png>` 둘 다 첨부 + 브리프에 수정 지시 추가.
-- 확정된 모델시트(`assets/caricature-board.png`)가 생기면 원화와 함께 두 장 첨부한다.
+- 수정: `-i "$A/reference-original.jpg" -i <직전결과.png>` 첨부 + 브리프에 수정 지시 추가.
+- 첨부 순서는 원화 → 모델시트 → 표정 시트. 원화가 항상 첫 번째(정답지).
 
 ### 3. 검수
 
