@@ -11,9 +11,7 @@ Scene:
 Expression:
 {음미 / 심사 / 몰입 / 체념 / 확신 + 한 줄 묘사}
 
-Caption (hand-lettered Korean, spelled EXACTLY, centered below the figure):
-{1줄}
-{2줄 (선택)}
+Caption: {없음 → "None. Do not draw any text, letters or caption anywhere." / 있으면 → hand-lettered Korean, spelled EXACTLY, centered below the figure: "{1줄}" / "{2줄}"}
 
 Character identity reference (dkdk caricature):
 The attached image is the official reference drawing. Draw the SAME man as a graphite-pencil caricature on plain white paper.
@@ -29,10 +27,10 @@ Line style:
 Single-weight soft 4B pencil outlines drawn in one stroke, occasionally broken. Solid hatched pencil fill ONLY in three places: hair behind the ears, the chin beard, and one side of the body outline (under a sleeve / along the torso). No gray tonal shading, no blending, no color, no digital clean lines.
 
 Framing and constraints:
-Deadpan exaggeration — emotion through eyebrows, brow lines and head tilt; mouth stays closed. 3:4 portrait, bust-up, three-quarter front view, head slightly raised. One prop held near the face. At least 35% empty white paper. No background, no speech bubbles, no other people, no title in a corner. Caption: one or two lines of neat, upright, widely spaced hand-lettered Korean in the same pencil, centered below the figure. Do not copy the reference's pose or prop unless the scene asks for it.
+Deadpan exaggeration — emotion through eyebrows, brow lines and head tilt; mouth stays closed. 3:4 portrait, bust-up, three-quarter front view, head slightly raised. One prop held near the face. At least 35% empty white paper. No background, no speech bubbles, no other people, no title in a corner. If a caption is given: one or two lines of neat, upright, widely spaced hand-lettered Korean in the same pencil, centered below the figure; otherwise no text at all. Do not copy the reference's pose or prop unless the scene asks for it.
 ```
 
-`Character identity reference`부터 끝까지는 고정 문구. 바꾸지 않는다.
+`Character identity reference`부터 끝까지는 고정 문구. 바꾸지 않는다. 캡션은 기본 "None".
 
 ## 수정 프롬프트
 
