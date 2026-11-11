@@ -23,6 +23,11 @@ CH = {
     'Gmaj7': (31, [31, 38, 43, 50, 54], [59, 62, 66, 67]),
     'Bm9': (35, [35, 42, 47, 49, 54], [57, 61, 62, 66]),
     'D/F#': (42, [42, 45, 50, 54, 57], [62, 64, 66, 69]),
+    # added 2026-11
+    'Em11': (40, [40, 47, 50, 54, 57], [55, 59, 62, 66]),
+    'A7sus4': (33, [33, 40, 43, 50, 52], [57, 62, 64, 67]),
+    'Cmaj7': (36, [36, 43, 47, 52, 55], [59, 64, 67, 71]),   # borrowed bVII (mixolydian colour)
+    'Bm7': (35, [35, 42, 45, 50, 54], [57, 59, 62, 66]),
 }
 PROGRESSIONS = {
     'tide': ['Dmaj9', 'Bm11', 'Gmaj9#11', 'Asus2'],
@@ -33,9 +38,18 @@ PROGRESSIONS = {
     'nocturne': ['Bm9', 'Em9', 'Gmaj7', 'F#m7'],
     'lament': ['Em9', 'Bm11', 'Gmaj9#11', 'F#m7'],
     'morning': ['Dmaj9', 'D/F#', 'Gmaj9#11', 'Asus2'],
+    # added 2026-11
+    'glow': ['Gmaj7', 'D/F#', 'Em9', 'Asus2'],
+    'plateau': ['Dmaj9', 'Asus2', 'Em9', 'Gmaj9#11'],
+    'horizon': ['Dmaj9', 'Cmaj7', 'Gmaj7', 'Dmaj9'],
+    'ember': ['Bm9', 'Gmaj9#11', 'Em11', 'F#m7'],
+    'hollow': ['Bm7', 'A7sus4', 'Gmaj7', 'Em9'],
 }
-PAIRS = {'major': [('tide', 'drift'), ('tide', 'lift'), ('open', 'drift'), ('morning', 'lift'), ('morning', 'drift')],
-         'minor': [('dusk', 'drift'), ('dusk', 'lift'), ('nocturne', 'lament'), ('lament', 'dusk'), ('nocturne', 'drift')]}
+MINOR = ('dusk', 'nocturne', 'lament', 'ember', 'hollow')   # named in B minor
+PAIRS = {'major': [('tide', 'drift'), ('tide', 'lift'), ('open', 'drift'), ('morning', 'lift'), ('morning', 'drift'),
+                   ('glow', 'plateau'), ('horizon', 'drift'), ('tide', 'glow'), ('plateau', 'lift')],
+         'minor': [('dusk', 'drift'), ('dusk', 'lift'), ('nocturne', 'lament'), ('lament', 'dusk'), ('nocturne', 'drift'),
+                   ('ember', 'hollow'), ('ember', 'drift'), ('hollow', 'lament')]}
 # arp = arpeggio instrument, mel = melody instrument, sus = sustain layer (GM programs)
 PALETTES = {
     'piano-strings': dict(arp=0, mel=0, sus=49, bright=(0.0, 1.0), energy=(0.0, 1.0), tags=['warm']),
@@ -44,15 +58,23 @@ PALETTES = {
     'guitar-piano': dict(arp=24, mel=0, sus=89, bright=(0.3, 0.9), energy=(0.2, 1.0), tags=['guitar', 'warm']),
     'celesta-piano': dict(arp=8, mel=0, sus=89, bright=(0.5, 1.0), energy=(0.0, 0.6), tags=['musicbox', 'dream']),
     'piano-pad': dict(arp=0, mel=0, sus=89, bright=(0.0, 0.5), energy=(0.0, 0.5), tags=['soft', 'warm']),
+    # added 2026-11 (FluidR3 GM). Arp instruments stay ones that sound right down to G1
+    'rhodes-flute': dict(arp=4, mel=73, sus=89, bright=(0.2, 0.8), energy=(0.0, 0.8), tags=['rhodes', 'flute', 'warm']),
+    'piano-oboe': dict(arp=0, mel=68, sus=49, bright=(0.4, 1.0), energy=(0.0, 0.8), tags=['oboe', 'pastoral', 'warm']),
+    'harp-clarinet': dict(arp=46, mel=71, sus=89, bright=(0.0, 0.6), energy=(0.0, 0.6), tags=['harp', 'clarinet', 'soft']),
+    'guitar-flute': dict(arp=24, mel=73, sus=49, bright=(0.4, 1.0), energy=(0.2, 1.0), tags=['guitar', 'flute']),
+    'harp-vibes': dict(arp=46, mel=11, sus=52, bright=(0.3, 0.9), energy=(0.0, 0.7), tags=['harp', 'vibes', 'dream']),
 }
 FORMS = {
     'classic': ['intro'] * 4 + ['A'] * 8 + ['B'] * 8 + ['C'] * 8 + ['out'] * 4,
     'short': ['intro'] * 4 + ['A'] * 4 + ['B'] * 8 + ['C'] * 8 + ['out'] * 4,
     'return': ['intro'] * 4 + ['A'] * 8 + ['B'] * 8 + ['C'] * 8 + ['A'] * 4 + ['out'] * 4,
 }
-ARPS = [[0, 1, 2, 3, 4, 3, 2, 1], [0, 2, 1, 3, 2, 4, 3, 1], [0, 1, 2, 4, 3, 4, 2, 1]]
+ARPS = [[0, 1, 2, 3, 4, 3, 2, 1], [0, 2, 1, 3, 2, 4, 3, 1], [0, 1, 2, 4, 3, 4, 2, 1],
+        [0, 1, 2, 3, 4, 2, 3, 1], [0, 2, 4, 2, 3, 4, 3, 1]]
 RHYTHMS = [[(0, 1.5), (1.5, .5), (2, 2)], [(0, 2), (2, 1), (3, 1)], [(0, 1.5), (1.5, 2.5)],
-           [(0, 2), (2, 2)], [(1, 1), (2, 2)], [(0, 3), (3, 1)]]
+           [(0, 2), (2, 2)], [(1, 1), (2, 2)], [(0, 3), (3, 1)],
+           [(0, 1), (1, 1), (2, 2)], [(0.5, 1.5), (2, 1.5), (3.5, .5)], [(0, 2.5), (2.5, 1.5)], [(0, 1), (1, 3)]]
 ENDINGS = [[(0, 4)], [(0, 3), (3, 1)], [(0, 2.5), (2.5, 1.5)]]
 PENT = [2, 4, 6, 9, 11]          # D major / B minor pentatonic
 SCALE = [2, 4, 6, 7, 9, 11, 1]   # D major
@@ -178,4 +200,4 @@ def render(p, out_path):
     master(mix * fadein * fadeout, out_path, lufs=LUFS)
     return dict(lufs_target=LUFS, beat=b, key_pcs=sorted((x + k) % 12 for x in SCALE),
                 chords=score, melody=[dict(pitch=x[0], start=x[1], dur=x[2]) for x in mel],
-                key_name=(key_name(k, 'B') + 'm') if pa in ('dusk', 'nocturne', 'lament') else key_name(k, 'D'), bars=bars)
+                key_name=(key_name(k, 'B') + 'm') if pa in MINOR else key_name(k, 'D'), bars=bars)

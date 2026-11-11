@@ -40,6 +40,7 @@ python3 make.py --genre newage --mood-set energy=0.2 brightness=0.7 texture=bird
 ```
 
 출력: `<genre>_<seed>.mp3`, `<genre>_<seed>.json`(plan·QC 지표·악보 요약), `report.json`(통과 여부·점수순). 3변주 기준 약 30-60초(병렬 렌더).
+mp3는 기본 224k. 스트리밍처럼 용량이 중요하면 `--bitrate 128k`(또는 `MUSIC_BITRATE=128k`). 곡은 같고 파일만 작아진다.
 
 요청 처리 순서:
 1. **무드가 있으면 무드부터.** 원문을 `--mood`로 넘기고, 사전에 없을 법한 표현이면 [references/moods.md](references/moods.md)를 보고 `--mood-set`으로 축(energy, brightness, mode, space, texture, palette)을 직접 정한다. 출력의 `mood:` 줄이 의도와 맞는지 확인한다.
@@ -55,15 +56,15 @@ python3 make.py --genre newage --mood-set energy=0.2 brightness=0.7 texture=bird
 **lofi** (`presets/lofi.py`, -14 LUFS)
 - `prog`: `ii-V-I-vi`(Rainy Window), `descending`, `minor-drift`, `neo-soul`
 - `form`: `classic`(intro4 A8 B8 break4 A'8 out4), `straight`, `long`
-- `prog` 추가: `dorian-night`, `melancholy`, `sunlit`
-- `palette`: `rhodes-piano`, `piano-vibes`, `guitar-flute`, `rhodes-guitar`, `piano-musicbox`, `rhodes-choir`
-- `bpm` 66-88(energy), `swing` 0.05-0.09, `key` -4..+3 (C 기준), `kick`/`comp`/`bassline` 0-2, `texture`
+- `prog` 추가: `dorian-night`, `melancholy`, `sunlit`, `four-chord`, `royal-road`, `backdoor`, `rain-minor`, `aeolian-walk`
+- `palette`: `rhodes-piano`, `piano-vibes`, `guitar-flute`, `rhodes-guitar`, `piano-musicbox`, `rhodes-choir`, `rhodes-trumpet`, `piano-clarinet`, `guitar-marimba`, `piano-kalimba`, `jazzguitar-vibes`
+- `bpm` 66-88(energy), `swing` 0.05-0.09, `key` -4..+3 (C 기준), `kick`/`comp`/`bassline` 0-3, `texture`
 
 **newage** (`presets/newage.py`, Tidewater와 같은 -16 LUFS 설정, 실측 약 -15)
-- `pair`: 진행 두 개 조합 (tide/drift/dusk/lift/open/nocturne/lament/morning)
-- `palette`: `piano-strings`, `piano-choir`, `harp-flute`, `guitar-piano`, `celesta-piano`, `piano-pad`
+- `pair`: 진행 두 개 조합 (tide/drift/dusk/lift/open/nocturne/lament/morning/glow/plateau/horizon/ember/hollow)
+- `palette`: `piano-strings`, `piano-choir`, `harp-flute`, `guitar-piano`, `celesta-piano`, `piano-pad`, `rhodes-flute`, `piano-oboe`, `harp-clarinet`, `guitar-flute`, `harp-vibes`
 - `form`: `classic`(intro4 A8 B8 C8 out4), `short`, `return`
-- `bpm` 56-76(energy), `key` -3..+3 (D 기준), `arp` 0-2, `texture`(기본 ocean)
+- `bpm` 56-76(energy), `key` -3..+3 (D 기준), `arp` 0-4, `texture`(기본 ocean)
 
 ## 품질 검사 (`scripts/qc.py`)
 

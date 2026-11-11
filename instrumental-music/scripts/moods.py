@@ -49,6 +49,11 @@ LEXICON = [
     (['비브라폰', 'vibes', 'vibraphone'], dict(palette_hint='vibes')),
     (['로즈', 'rhodes', '일렉피아노', 'electric piano'], dict(palette_hint='rhodes')),
     (['합창', 'choir', '보이스', 'voice'], dict(palette_hint='choir')),
+    (['트럼펫', 'trumpet'], dict(palette_hint='trumpet')),
+    (['클라리넷', 'clarinet'], dict(palette_hint='clarinet')),
+    (['오보에', 'oboe', '목가', 'pastoral', '전원'], dict(palette_hint='oboe')),
+    (['마림바', 'marimba'], dict(palette_hint='marimba')),
+    (['칼림바', 'kalimba'], dict(palette_hint='kalimba')),
     (['단조', 'minor'], dict(mode='minor')),
     (['장조', 'major'], dict(mode='major')),
 ]

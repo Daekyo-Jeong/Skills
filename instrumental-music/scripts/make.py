@@ -7,6 +7,7 @@
   python make.py --genre lofi --seed 7 --variants 1 --set bpm=76 key=2 prog=descending
   python make.py --mood "비 오는 새벽, 쓸쓸한데 따뜻하게" --variants 3   # genre inferred from mood
   python make.py --genre newage --mood-set energy=0.2 brightness=0.7 texture=birds palette=harp-flute
+  python make.py --genre lofi --bitrate 128k           # smaller mp3 for streaming (same song)
 
 Each variant: plan(seed) -> render -> qc. A failing variant is regenerated with
 seed+1000 (deterministic) up to --tries times. Output per variant:
@@ -82,8 +83,11 @@ def main():
     ap.add_argument('--out', default='music_out')
     ap.add_argument('--set', nargs='*', help='override plan fields, e.g. bpm=76 key=2 prog=descending')
     ap.add_argument('--keep-wav', action='store_true')
+    ap.add_argument('--bitrate', help='mp3 bitrate, e.g. 128k (default 224k or $MUSIC_BITRATE). Same song, smaller file')
     ap.add_argument('--jobs', type=int, default=min(3, os.cpu_count() or 1))
     a = ap.parse_args()
+    if a.bitrate:
+        os.environ['MUSIC_BITRATE'] = a.bitrate  # inherited by the worker processes
     os.makedirs(a.out, exist_ok=True)
     base = a.seed if a.seed is not None else random.randrange(1, 100000)
     seeds = [base + i for i in range(a.variants)]

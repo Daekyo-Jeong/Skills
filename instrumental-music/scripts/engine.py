@@ -149,9 +149,11 @@ def place(buf, x, t, gain=1.0, p=0.5):
     if e > s: buf[s:e] += x[:e - s] * gain
 
 
-def master(x, path, lufs=-14, lowcut=30, bitrate='224k'):
+def master(x, path, lufs=-14, lowcut=30, bitrate=None):
     """Write <path>.wav (pre-loudnorm, peak-normalised) and <path>.mp3 (compressed + loudnorm).
-    Returns the peak-normalised float mix for QC."""
+    The mp3 bitrate is 224k unless MUSIC_BITRATE (or make.py --bitrate) says otherwise; it only
+    changes the file size, never the composition. Returns the peak-normalised float mix for QC."""
+    bitrate = bitrate or os.environ.get('MUSIC_BITRATE') or '224k'
     x = hp(x, lowcut, 2); x = saturate(x, 1.2); x /= np.abs(x).max() * 1.02
     wavfile.write(path + '.wav', SR, (x * 32767).astype(np.int16))
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', path + '.wav', '-af',
