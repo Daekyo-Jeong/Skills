@@ -1,6 +1,8 @@
-# dkdk-illustrations
+# dkdk-walrus
 
-dkdk(바다코끼리 자화상 IP) 스타일의 한국어 본문 삽화를 생성하는 Claude Code 스킬.
+> 구 이름 `dkdk-illustrations` (2026-11-11 rename). 자매 스킬: `dkdk-caricature`, `didi`.
+
+dkdk 수인화(바다코끼리 자화상 IP) 스타일의 한국어 본문 삽화를 생성하는 Claude Code 스킬.
 
 순백 배경 · 검정 손그림 선화 · 소량의 빨강(강조)/주황(흐름)/파랑(보조) 한글 손글씨 주석 · 16:9 가로. 글을 소화해 인지 앵커를 뽑고, 장당 하나의 은유를 새로 발명해서 그린다. [ian-xiaohei-illustrations](https://github.com/helloianneo/ian-xiaohei-illustrations)를 dkdk IP + 한국어로 번안했다.
 
