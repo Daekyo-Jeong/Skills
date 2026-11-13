@@ -58,20 +58,22 @@ mp3는 기본 224k. 스트리밍처럼 용량이 중요하면 `--bitrate 128k`(�
 - `form`: `classic`(intro4 A8 B8 break4 A'8 out4), `straight`, `long`
 - `prog` 추가: `dorian-night`, `melancholy`, `sunlit`, `four-chord`, `royal-road`, `backdoor`, `rain-minor`, `aeolian-walk`
 - `palette`: `rhodes-piano`, `piano-vibes`, `guitar-flute`, `rhodes-guitar`, `piano-musicbox`, `rhodes-choir`, `rhodes-trumpet`, `piano-clarinet`, `guitar-marimba`, `piano-kalimba`, `jazzguitar-vibes`
-- `bpm` 66-88(energy), `swing` 0.05-0.09, `key` -4..+3 (C 기준), `kick`/`comp`/`bassline` 0-3, `texture`
+- `kit`: `dusty`(Rainy Window), `soft`(사이드스틱, 어두운 버스), `punch`(붐뱁), `tape`(포화·먹먹). energy로 후보가 갈린다
+- `scale`: 멜로디 `pent`(펜타토닉) / `diatonic`(7음), `wow` 0.8-2.2 테이프 흔들림, `vinyl_db` -46..-40 바이닐 바닥 크기
+- `bpm` 59-95(energy), `swing` 0.05-0.09, `key` -5..+5 (C 기준), `kick`/`comp`/`bassline` 0-3, `texture`(지정 없으면 vinyl·none·rain·night 중)
 
 **newage** (`presets/newage.py`, Tidewater와 같은 -16 LUFS 설정, 실측 약 -15)
 - `pair`: 진행 두 개 조합 (tide/drift/dusk/lift/open/nocturne/lament/morning/glow/plateau/horizon/ember/hollow)
 - `palette`: `piano-strings`, `piano-choir`, `harp-flute`, `guitar-piano`, `celesta-piano`, `piano-pad`, `rhodes-flute`, `piano-oboe`, `harp-clarinet`, `guitar-flute`, `harp-vibes`
 - `form`: `classic`(intro4 A8 B8 C8 out4), `short`, `return`
-- `bpm` 56-76(energy), `key` -3..+3 (D 기준), `arp` 0-4, `texture`(기본 ocean)
+- `bpm` 50-78(energy), `key` -4..+4 (D 기준), `arp` 0-4, `texture`(지정 없으면 ocean·birds·none 중)
 
 **jazz** (`presets/jazz.py`, -15 LUFS, 초안: 레퍼런스 곡 승인 전)
 - 스윙 8분, 피아노 rootless comping, 콘트라베이스 워킹(코드 첫 박 근음, 마지막 박 반음/5도 접근음), 브러시 킷(GM 40)
 - `prog`(head): `two-five`, `rhythm`, `backdoor`, `turnaround` / minor `falling-leaves`, `minor-blue`. bridge는 head에 맞춰 정해짐
 - `palette`: `piano-trio`, `vibes-trio`, `tenor-quartet`, `trumpet-quartet`, `guitar-trio`
 - `form`: `standard`(intro4 A8 A8 B8 A8 피아노솔로8 A8 out4), `long`(솔로 16)
-- `bpm` 92-140(energy), `swing` 0.12-0.16, `brushes` swirl(energy<0.4)/ride, `texture`(기본 none)
+- `bpm` 86-144(energy), `key` -5..+3, `swing` 0.12-0.16, `brushes` swirl(energy<0.4)/ride, `texture`(기본 none)
 
 **chiptune** (`presets/chiptune.py`, -14 LUFS, 초안: 레퍼런스 곡 승인 전)
 - 전부 DSP: 사각파 리드(늦게 걸리는 vibrato + 3/4박 echo), 사각파 아르페지오, 4bit 삼각파 베이스, 노이즈 드럼. 고음은 low-pass로 깎는다
@@ -79,13 +81,19 @@ mp3는 기본 224k. 스트리밍처럼 용량이 중요하면 `--bitrate 128k`(�
 - `form`: `classic`, `long`, `lead_duty`·`arp_duty` 0.125-0.5, `arp_rate` 4/6, `bassline` octave/root-fifth/pulse
 - `bpm` 96-140(energy), `half_time`(energy<0.3)
 
+**bossa** (`presets/bossa.py`, -15 LUFS, 초안: 레퍼런스 곡 승인 전)
+- 스트레이트 8분, 나일론 기타 comping(2마디 싱코페이션 패턴 4종), 콘트라베이스 근음-5도 점4분, 림 클릭 보사 클라베(3-2/2-3)·셰이커·작은 킥
+- `prog`(head): `sunny-two-five`, `terrace`, `promenade`, `side-step` / minor `saudade`, `low-tide`. bridge는 head에 맞춰 정해짐
+- `palette`: `guitar-flute`, `guitar-vibes`, `guitar-piano`(현악 패드), `guitar-trumpet`, `guitar-clarinet`(현악 패드), `guitar-sax`, `guitar-solo`
+- `form`: `standard`(intro4 A8 A8 B8 A8 솔로8 A8 out4), `long`(솔로 16), `bpm` 99-131(energy), `texture`(지정 없으면 none·ocean·birds 중)
+
 ## 품질 검사 (`scripts/qc.py`)
 
 단독 실행도 된다: `python3 qc.py track.mp3 --genre lofi`. 하드 체크 하나라도 실패하면 탈락.
 
 | 체크 | 기준 |
 |---|---|
-| loudness | integrated LUFS가 장르 목표 ±1 LU (lofi -14, newage -15, jazz -15, chiptune -14) |
+| loudness | integrated LUFS가 장르 목표 ±1 LU (lofi -14, newage -15, jazz -15, bossa -15, chiptune -14) |
 | true_peak | ≤ -0.1 dBTP (4x oversampling) |
 | clipping | full scale 샘플 < 0.001% |
 | silence | 곡 본문에 2초 넘는 -50 dBFS 이하 구간 없음 |
@@ -94,7 +102,7 @@ mp3는 기본 224k. 스트리밍처럼 용량이 중요하면 `--bitrate 128k`(�
 | spectrum | low/mid/high 에너지 비율이 장르 창 안 |
 | harmony | 멜로디의 코드 반음 충돌 ≤ 8%, 키 밖 음 ≤ 5% |
 
-창은 두 레퍼런스 실측값에 여유를 둬서 정했다. jazz·chiptune은 레퍼런스 곡이 승인되기 전이라 창을 넓게 둔 초안이다. 값과 근거는 [references/quality-bar.md](references/quality-bar.md). 점수(0-100)는 통과한 변주끼리 순위를 매기는 용도다. **QC는 기술적 결함을 거르는 장치지 귀를 대신하지 않는다.** 사용자 피드백으로 기준이 바뀌면 quality-bar.md와 `PROFILES`를 같이 고친다.
+창은 두 레퍼런스 실측값에 여유를 둬서 정했다. jazz·bossa·chiptune은 레퍼런스 곡이 승인되기 전이라 창을 넓게 둔 초안이다. 값과 근거는 [references/quality-bar.md](references/quality-bar.md). 점수(0-100)는 통과한 변주끼리 순위를 매기는 용도다. 다만 점수는 레퍼런스에 가까울수록 높아서, 여러 곡을 계속 만드는 앱은 1위만 고르면 곡들이 서로 닮는다. 그런 앱은 통과작 중에서 최근 곡과 가장 다른 것을 고르는 편이 낫다(dkdk-tape 워커가 그렇게 한다). **QC는 기술적 결함을 거르는 장치지 귀를 대신하지 않는다.** 사용자 피드백으로 기준이 바뀌면 quality-bar.md와 `PROFILES`를 같이 고친다.
 
 ## preset 추가 / 수정
 
@@ -105,4 +113,4 @@ mp3는 기본 224k. 스트리밍처럼 용량이 중요하면 `--bitrate 128k`(�
 ## 알려진 약점
 
 - 피아노 음색은 FluidR3 GM 수준. 더 좋은 SoundFont(예: Salamander Grand, GeneralUser GS)를 `MUSIC_SF2`로 지정하면 엔진 수정 없이 바뀐다. 바꾼 뒤엔 레퍼런스 QC를 다시 본다.
-- 장르는 네 개(jazz·chiptune은 초안). 질감은 6종(vinyl, rain, fire, birds, night, ocean). 곡 길이는 약 2-2.5분(`form=long`/`return`으로 조금 더 길게).
+- 장르는 다섯 개(jazz·bossa·chiptune은 초안). 질감은 6종(vinyl, rain, fire, birds, night, ocean). 곡 길이는 약 2-2.5분(`form=long`/`return`으로 조금 더 길게).

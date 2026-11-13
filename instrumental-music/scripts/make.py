@@ -27,6 +27,7 @@ GENRES = {  # name -> (preset module, QC profile)
     'tidewater': ('presets.tidewater', 'newage'),
     'jazz': ('presets.jazz', 'jazz'),
     'chiptune': ('presets.chiptune', 'chiptune'),
+    'bossa': ('presets.bossa', 'bossa'),
 }
 
 
