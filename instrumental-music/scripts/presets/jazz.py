@@ -81,7 +81,7 @@ def plan(seed, mood=None):
         form='long' if e < 0.35 else r.choice(['standard', 'standard', 'long']),
         brushes='swirl' if e < 0.4 else 'ride',
         palette=pick_palette(r, PALETTES, dict(m, brightness=br)),
-        texture=m.get('texture') or 'none',
+        texture=m.get('texture') or r.choice(['none', 'none', 'vinyl', 'night', 'rain']),
         lead_cut=int(5000 + 4000 * br),
         room=round(1.2 + 1.2 * m.get('space', 0.5), 2), wet=round(0.14 + 0.1 * m.get('space', 0.5), 3),
         mood={k: m.get(k) for k in ('energy', 'brightness', 'mode', 'space', 'texture', 'matched') if k in m},

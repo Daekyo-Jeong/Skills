@@ -73,7 +73,7 @@ mp3는 기본 224k. 스트리밍처럼 용량이 중요하면 `--bitrate 128k`(�
 - `prog`(head): `two-five`, `rhythm`, `backdoor`, `turnaround` / minor `falling-leaves`, `minor-blue`. bridge는 head에 맞춰 정해짐
 - `palette`: `piano-trio`, `vibes-trio`, `tenor-quartet`, `trumpet-quartet`, `guitar-trio`
 - `form`: `standard`(intro4 A8 A8 B8 A8 피아노솔로8 A8 out4), `long`(솔로 16)
-- `bpm` 86-144(energy), `key` -5..+3, `swing` 0.12-0.16, `brushes` swirl(energy<0.4)/ride, `texture`(기본 none)
+- `bpm` 86-144(energy), `key` -5..+3, `swing` 0.12-0.16, `brushes` swirl(energy<0.4)/ride, `texture`(지정 없으면 none·vinyl·night·rain 중, none 비중 2/5)
 
 **chiptune** (`presets/chiptune.py`, -14 LUFS, 초안: 레퍼런스 곡 승인 전)
 - 전부 DSP: 사각파 리드(늦게 걸리는 vibrato + 3/4박 echo), 사각파 아르페지오, 4bit 삼각파 베이스, 노이즈 드럼. 고음은 low-pass로 깎는다
