@@ -74,8 +74,8 @@ def plan(seed, mood=None):
     head = m.get('prog') if m.get('prog') in PROGRESSIONS and m.get('prog') in BRIDGES else r.choice(heads)
     return dict(
         seed=seed,
-        key=r.choice([-4, -3, -2] if br < 0.35 else ([0, 2, 3] if br > 0.65 else [-2, 0, 2])),
-        bpm=int(round(96 + e * 40 + r.uniform(-4, 4))),
+        key=r.choice([-5, -4, -3, -2] if br < 0.35 else ([0, 1, 2, 3] if br > 0.65 else [-3, -2, -1, 0, 2])),
+        bpm=int(round(90 + e * 50 + r.uniform(-4, 4))),
         swing=round(r.uniform(0.12, 0.16), 3),
         prog=head, bridge=BRIDGES[head],
         form='long' if e < 0.35 else r.choice(['standard', 'standard', 'long']),

@@ -51,7 +51,7 @@ def plan(seed, mood=None):
         pa = m['prog']
     return dict(
         seed=seed,
-        key=r.choice([-3, -2, 0] if br < 0.35 else ([0, 2, 3] if br > 0.65 else [-2, 0, 2])),
+        key=r.choice([-4, -3, -2, 0] if br < 0.35 else ([0, 2, 3, 5] if br > 0.65 else [-3, -2, 0, 2, 3])),
         bpm=int(round(100 + e * 36 + r.uniform(-4, 4))),
         pair=[pa, pb],
         form='long' if e < 0.4 else r.choice(['classic', 'long']),

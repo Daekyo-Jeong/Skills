@@ -31,6 +31,8 @@ PROFILES = {
     # drafts: wide windows until a reference track is approved
     'jazz':   dict(lufs=-15, crest=(8, 24), lra=(1.0, 14), low=(0.10, 0.85), mid=(0.10, 0.85), high=(0.001, 0.15),
                    dur=(90, 360)),
+    'bossa':  dict(lufs=-15, crest=(8, 24), lra=(1.0, 14), low=(0.10, 0.85), mid=(0.10, 0.85), high=(0.001, 0.15),
+                   dur=(90, 360)),
     'chiptune': dict(lufs=-14, crest=(6, 22), lra=(1.0, 14), low=(0.05, 0.85), mid=(0.10, 0.85), high=(0.001, 0.25),
                      dur=(90, 330)),
 }

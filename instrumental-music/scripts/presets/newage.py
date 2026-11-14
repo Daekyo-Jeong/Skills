@@ -91,15 +91,15 @@ def plan(seed, mood=None):
     pairs = PAIRS.get(m.get('mode')) or PAIRS['major'] + PAIRS['minor']
     return dict(
         seed=seed,
-        key=r.choice([-3, -2, -1] if br < 0.35 else ([1, 2, 3] if br > 0.65 else [-2, 0, 1])),
-        bpm=int(round(56 + e * 18 + r.uniform(-2, 2))),
+        key=r.choice([-4, -3, -2, -1] if br < 0.35 else ([1, 2, 3, 4] if br > 0.65 else [-2, -1, 0, 1, 2])),
+        bpm=int(round(52 + e * 24 + r.uniform(-2, 2))),
         pair=list(r.choice(pairs)),
         form=r.choice(['classic', 'classic', 'short', 'return']),
         arp=r.randrange(len(ARPS)),
         arp_density=4 if e < 0.25 else 8,
         bells=0 if e < 0.15 else (3 if e > 0.6 else 2),
         palette=pick_palette(r, PALETTES, dict(m, brightness=br)),
-        texture=m.get('texture') or 'ocean',
+        texture=m.get('texture') or r.choice(['ocean', 'ocean', 'birds', 'none']),
         hall=round(4.0 + 3.0 * sp, 2), wet=round(0.35 + 0.2 * sp, 3),
         piano_cut=int(6500 + 4000 * br),
         mood={k: m.get(k) for k in ('energy', 'brightness', 'mode', 'space', 'texture', 'matched') if k in m},

@@ -80,10 +80,42 @@ RHYTHMS = [[(0, 1), (1, .5), (1.5, 1), (3, 1)], [(0.5, .5), (1, .5), (1.5, 1.5),
 SLOW_RHYTHMS = [[(0, 2), (2, 1), (3, 1)], [(0, 1.5), (1.5, .5), (2, 2)], [(1, 1), (2, 2)], [(0, 3), (3, 1)],
                 [(0, 2), (2, 2)], [(0.5, 1.5), (2, 2)]]
 ENDINGS = [[(0, 3)], [(0, 2), (2, 1.5)], [(0.5, .5), (1, 2.5)]]
+# drum kits (added 2026-11): DSP voice settings + bus filter + level. 'dusty' is the Rainy Window kit.
+#   kick (f0 Hz, decay), snare (band lo, hi, decay, body Hz), hat (hp Hz, decay), rim = side-stick click instead of snare
+KITS = {
+    'dusty': dict(kick=(48, 7), snare=(900, 5000, 16, 180), hat=(7000, 70), rim=False, bus=7500, drive=2.0, db=-19.5),
+    'soft': dict(kick=(44, 9), snare=(700, 3500, 22, 160), hat=(6000, 90), rim=True, bus=5000, drive=1.4, db=-21.5),
+    'punch': dict(kick=(54, 6), snare=(1200, 6500, 13, 200), hat=(8000, 60), rim=False, bus=9000, drive=2.6, db=-19),
+    'tape': dict(kick=(46, 8), snare=(800, 4200, 18, 170), hat=(6500, 80), rim=False, bus=4200, drive=3.0, db=-20.5),
+}
 PENT = [0, 2, 4, 7, 9]   # C major / A minor pentatonic (relative to key)
 SCALE = [0, 2, 4, 5, 7, 9, 11]
 TEXTURE_DB = {'vinyl': -42, 'rain': -33, 'fire': -36, 'birds': -36, 'night': -38, 'ocean': -36}
 LUFS = -14
+
+
+def kit_kick(f0=48, decay=7):
+    n = int(0.5 * SR); t = np.arange(n) / SR
+    x = np.sin(2 * np.pi * (f0 * t + 70 * (1 - np.exp(-t * 25)) / 25)) * np.exp(-t * decay)
+    click = lp(E.rng.standard_normal(n), 3000) * np.exp(-t * 200) * 0.3
+    return np.tanh(2 * (x + click)) * 0.8
+
+
+def kit_snare(lo=900, hi=5000, decay=16, body=180):
+    n = int(0.35 * SR); t = np.arange(n) / SR
+    nz = bp(E.rng.standard_normal(n), lo, hi) * np.exp(-t * decay)
+    return (nz * 0.7 + np.sin(2 * np.pi * body * t) * np.exp(-t * 25) * 0.5) * 0.7
+
+
+def kit_hat(hp_hz=7000, decay=70):
+    n = int((0.25 if decay < 30 else 0.06) * SR); t = np.arange(n) / SR
+    return hp(E.rng.standard_normal(n), hp_hz, 2) * np.exp(-t * decay) * 0.35
+
+
+def kit_rim():
+    n = int(0.08 * SR); t = np.arange(n) / SR
+    x = np.sin(2 * np.pi * 1750 * t) * np.exp(-t * 90) + bp(E.rng.standard_normal(n), 2000, 6000) * np.exp(-t * 120) * 0.5
+    return x * 0.6
 
 
 def plan(seed, mood=None):
@@ -92,11 +124,14 @@ def plan(seed, mood=None):
                      texture=None, palette=None, prog=None, hints=[])
     e, br = m['energy'], max(0.1, m['brightness'])
     progs = MODE.get(m.get('mode')) or list(PROGRESSIONS)
-    keys_lo = [-4, -3, -2] if br < 0.35 else ([0, 2, 3] if br > 0.65 else [-2, 0, 2])
+    keys_lo = [-5, -4, -3, -2, -1] if br < 0.35 else ([0, 1, 2, 3, 5] if br > 0.65 else [-3, -2, -1, 0, 2])
+    kits = ['soft', 'soft', 'dusty', 'tape'] if e < 0.3 else (['punch', 'dusty', 'tape'] if e > 0.7 else list(KITS))
     return dict(
         seed=seed,
         key=r.choice(keys_lo),
-        bpm=int(round(66 + e * 20 + r.uniform(-2, 2))),
+        bpm=int(round(62 + e * 30 + r.uniform(-3, 3))),
+        kit=r.choice(kits),
+        scale=r.choice(['pent', 'pent', 'diatonic']),
         swing=round(r.uniform(0.05, 0.09), 3),
         prog=m.get('prog') if m.get('prog') in PROGRESSIONS else r.choice(progs),
         form=r.choice(['classic', 'classic', 'straight', 'long']),
@@ -104,12 +139,14 @@ def plan(seed, mood=None):
         comp=2 if e < 0.3 else (1 if e > 0.7 else r.randrange(len(COMPS))),
         bassline=1 if e < 0.3 else r.randrange(len(BASSLINES)),
         palette=pick_palette(r, PALETTES, dict(m, brightness=br)),
-        texture=m.get('texture') or 'vinyl',
+        texture=m.get('texture') or r.choice(['vinyl', 'vinyl', 'none', 'rain', 'night']),
         hat_prob=round(0.65 + 0.3 * e, 2),
         slow_melody=e < 0.3,
         keys_cut=int(3000 + 2500 * br), mel_cut=int(3800 + 2500 * br),
         room=round(1.6 + 1.6 * m.get('space', 0.5), 2), wet=round(0.22 + 0.12 * m.get('space', 0.5), 3),
-        vinyl=r.randint(4, 7),
+        vinyl=r.randint(2, 8),
+        vinyl_db=r.choice([-46, -44, -42, -40]),
+        wow=round(r.uniform(0.8, 2.2), 2),
         mood={k: m.get(k) for k in ('energy', 'brightness', 'mode', 'space', 'texture', 'matched') if k in m},
     )
 
@@ -119,6 +156,8 @@ def render(p, out_path):
     random.seed(p['seed'] * 7919 + 1)
     k = p['key']; BPM = p['bpm']; b = 60 / BPM; SW = p['swing']
     pal = PALETTES[p['palette']]
+    kit = KITS[p.get('kit', 'dusty')]
+    wow = p.get('wow', 1.6)
     prog = [(root + k, [x + k for x in ks]) for root, ks in PROGRESSIONS[p['prog']]]
     sect = FORMS[p['form']]
     bars = len(sect); L = int((bars * 4 * b + 6) * SR)
@@ -130,7 +169,8 @@ def render(p, out_path):
     # ---- melody (rule-based, chord aware) ----
     chords = [chord_pcs([root] + ks) for root, ks in prog]
     lo = 69 + k if pal['mel'] not in (10,) else 74 + k   # music box sits higher
-    mel_gen = Melody(random, scale=[(x + k) % 12 for x in PENT], lo=lo, hi=lo + 12,
+    mel_scale = SCALE if p.get('scale') == 'diatonic' else PENT
+    mel_gen = Melody(random, scale=[(x + k) % 12 for x in mel_scale], lo=lo, hi=lo + 12,
                      rhythms=SLOW_RHYTHMS if p['slow_melody'] else RHYTHMS, endings=ENDINGS)
     first = {s: sect.index(s) for s in set(sect)}
     aligned = lambda sc: [chords[(first[sc] + j) % 8] for j in range(8)]
@@ -157,19 +197,23 @@ def render(p, out_path):
     keys += [(x, end, 4, 48) for x in prog[0][1]]
     K = render_midi(keys, pal['keys'], L, BPM, gain=0.55)
     M = render_midi(mel, pal['mel'], L, BPM, gain=0.45)
-    K = wow_flutter(saturate(lp(hp(K, 120), p['keys_cut']), 1.8), 1.6, 0.45)
-    M = wow_flutter(saturate(lp(M, p['mel_cut']), 1.4), 1.2, 0.5)
+    K = wow_flutter(saturate(lp(hp(K, 120), p['keys_cut']), 1.8), wow, 0.45)
+    M = wow_flutter(saturate(lp(M, p['mel_cut']), 1.4), wow * 0.75, 0.5)
 
     drums = np.zeros((L, 2)); bass = np.zeros((L, 2)); pad = np.zeros((L, 2)); kicks = []
     for i, sc in enumerate(sect):
         root, ch = prog[i % 8]
         if sc in ('A', 'B', 'A2', 'B2'):
             for pos in KICKS[p['kick']][i % 2]:
-                place(drums, lofi_kick(), T(i, pos), 0.9); kicks.append(T(i, pos))
-            for pos in (1, 3): place(drums, lofi_snare(), T(i, pos) + 0.012, 0.55, 0.52)
+                place(drums, kit_kick(*kit['kick']), T(i, pos), 0.9); kicks.append(T(i, pos))
+            for pos in (1, 3):
+                if kit['rim']:
+                    place(drums, kit_rim(), T(i, pos) + 0.012, 0.5, 0.48)
+                else:
+                    place(drums, kit_snare(*kit['snare']), T(i, pos) + 0.012, 0.55, 0.52)
             for e in range(8):
-                if random.random() < p['hat_prob']: place(drums, lofi_hat(), T(i, e / 2), 0.35 + 0.15 * (e % 2 == 0), 0.62)
-            if i % 4 == 3: place(drums, lofi_hat(True), T(i, 3.5), 0.35, 0.62)
+                if random.random() < p['hat_prob']: place(drums, kit_hat(*kit['hat']), T(i, e / 2), 0.35 + 0.15 * (e % 2 == 0), 0.62)
+            if i % 4 == 3: place(drums, kit_hat(kit['hat'][0], 12), T(i, 3.5), 0.35, 0.62)
             for pos, iv, l in BASSLINES[p['bassline']](i):
                 place(bass, sub_bass(root + iv, l * b), T(i, pos), 0.9)
         if pal['pad'] == 'saw':
@@ -179,13 +223,13 @@ def render(p, out_path):
                 for x in ch[:3]: place(pad, pad_voice(x + 12, 4 * b, bright=500, a=1.5, r=2.0), i * 4 * b, 0.05, 0.5)
     if pal['pad'] != 'saw':
         pad = lp(hp(render_midi(padn, pal['pad'], L, BPM, gain=0.5), 200), 2500)
-    drums = lp(drums, 7500); drums = saturate(drums, 2.0)
+    drums = lp(drums, kit['bus']); drums = saturate(drums, kit['drive'])
     sc_gain = sidechain(L, kicks, 0.35, 0.3)
-    K = to_db(K, -21); M = to_db(M, -23); drums = to_db(drums, -19.5); bass = to_db(bass, -21); pad = to_db(pad, -29)
+    K = to_db(K, -21); M = to_db(M, -23); drums = to_db(drums, kit['db']); bass = to_db(bass, -21); pad = to_db(pad, -29)
     dry = K * sc_gain + M + drums + bass + pad * sc_gain
     wet = reverb(K * 0.5 + M * 0.7 + pad * 0.8 + drums * 0.12, decay=p['room'], tone=4000)
     tex = p['texture']
-    amb = to_db(st(vinyl(L, p['vinyl'])), -42)
+    amb = to_db(st(vinyl(L, p['vinyl'])), p.get('vinyl_db', -42))
     if tex != 'vinyl':
         amb = amb * 0.6 + (to_db(texture(tex, L), TEXTURE_DB[tex]) if tex != 'none' else 0)
     mix = dry + wet * p['wet'] + amb
