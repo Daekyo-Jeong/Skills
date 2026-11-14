@@ -12,6 +12,7 @@ import engine as E
 from engine import *  # noqa: F401,F403
 from presets.common import Melody, chord_pcs, key_name
 from moods import pick_palette
+import chapters as C
 
 # (bass root midi, keys voicing) in C. Pad uses the first three keys tones.
 PROGRESSIONS = {
@@ -126,7 +127,7 @@ def plan(seed, mood=None):
     progs = MODE.get(m.get('mode')) or list(PROGRESSIONS)
     keys_lo = [-5, -4, -3, -2, -1] if br < 0.35 else ([0, 1, 2, 3, 5] if br > 0.65 else [-3, -2, -1, 0, 2])
     kits = ['soft', 'soft', 'dusty', 'tape'] if e < 0.3 else (['punch', 'dusty', 'tape'] if e > 0.7 else list(KITS))
-    return dict(
+    p = dict(
         seed=seed,
         key=r.choice(keys_lo),
         bpm=int(round(62 + e * 30 + r.uniform(-3, 3))),
@@ -148,7 +149,11 @@ def plan(seed, mood=None):
         vinyl_db=r.choice([-46, -44, -42, -40]),
         wow=round(r.uniform(0.8, 2.2), 2),
         mood={k: m.get(k) for k in ('energy', 'brightness', 'mode', 'space', 'texture', 'matched') if k in m},
+        chapters=C.clean(m.get('chapters')),
     )
+    if len(p['chapters']) >= 5:
+        p['form'] = 'long'   # 5 body sections: A B brk A2 B2
+    return p
 
 
 def render(p, out_path):
@@ -161,6 +166,13 @@ def render(p, out_path):
     prog = [(root + k, [x + k for x in ks]) for root, ks in PROGRESSIONS[p['prog']]]
     sect = FORMS[p['form']]
     bars = len(sect); L = int((bars * 4 * b + 6) * SR)
+    chap, timeline = C.assign(sect, p.get('chapters'))
+    cv = lambda i, k, d=None: (chap[i] or {}).get(k) or d
+    def drums_of(i):
+        ch = chap[i]
+        if not ch:
+            return 'full'
+        return ch['drums'] or ('light' if ch['energy'] <= -0.2 else 'full')
 
     def T(bar, beat):
         sw = SW if (round(beat * 2) % 2 == 1) else 0
@@ -183,37 +195,46 @@ def render(p, out_path):
     for i, sc in enumerate(sect):
         root, ch = prog[i % 8]
         hits = COMPS[p['comp']] if sc != 'brk' else [(0, 3.8, 52)]
+        if sc != 'brk' and cv(i, 'energy', 0) <= -0.2:
+            hits = COMPS[2]   # sparse comp in a quiet chapter
         strum = 0.03 if pal['keys'] in (24, 25, 26) else 0.018
         for pos, l, v in hits:
             for j, pp in enumerate(ch):
                 keys.append((pp, T(i, pos) + j * strum + random.uniform(0, 0.01), l * b, v + random.randint(-6, 6)))
         score.append(dict(bar=i, start=i * 4 * b, end=(i + 1) * 4 * b, pcs=sorted(chords[i % 8])))
         if sc in ('B', 'A2', 'B2'):
+            prog_no = C.LEADS.get(cv(i, 'lead'), pal['mel'])
             for o, pp, l in lines[sc][(i - first[sc]) % 8]:
-                mel.append((pp, T(i, o), l * b * 0.95, 70 + random.randint(-8, 8)))
+                mel.append((pp, T(i, o), l * b * 0.95, 70 + random.randint(-8, 8), prog_no))
         if pal['pad'] != 'saw':
             for x in ch[:3]: padn.append((x + 12, i * 4 * b, 4 * b + 0.2, 40 if sc != 'intro' else 32))
     end = bars * 4 * b
     keys += [(x, end, 4, 48) for x in prog[0][1]]
     K = render_midi(keys, pal['keys'], L, BPM, gain=0.55)
-    M = render_midi(mel, pal['mel'], L, BPM, gain=0.45)
+    # lead may change per chapter: one stem per GM program, summed
+    M = sum(render_midi([x[:4] for x in mel if x[4] == g], g, L, BPM, gain=0.45) for g in sorted({x[4] for x in mel})) \
+        if mel else np.zeros((L, 2))
     K = wow_flutter(saturate(lp(hp(K, 120), p['keys_cut']), 1.8), wow, 0.45)
     M = wow_flutter(saturate(lp(M, p['mel_cut']), 1.4), wow * 0.75, 0.5)
 
     drums = np.zeros((L, 2)); bass = np.zeros((L, 2)); pad = np.zeros((L, 2)); kicks = []
     for i, sc in enumerate(sect):
         root, ch = prog[i % 8]
-        if sc in ('A', 'B', 'A2', 'B2'):
-            for pos in KICKS[p['kick']][i % 2]:
-                place(drums, kit_kick(*kit['kick']), T(i, pos), 0.9); kicks.append(T(i, pos))
+        dm = drums_of(i)
+        if sc in ('A', 'B', 'A2', 'B2') and dm != 'off':
+            light = dm == 'light'
+            for pos in (KICKS[p['kick']][i % 2][:1] if light else KICKS[p['kick']][i % 2]):
+                place(drums, kit_kick(*kit['kick']), T(i, pos), 0.75 if light else 0.9); kicks.append(T(i, pos))
             for pos in (1, 3):
-                if kit['rim']:
-                    place(drums, kit_rim(), T(i, pos) + 0.012, 0.5, 0.48)
+                if kit['rim'] or light:
+                    place(drums, kit_rim(), T(i, pos) + 0.012, 0.4 if light else 0.5, 0.48)
                 else:
                     place(drums, kit_snare(*kit['snare']), T(i, pos) + 0.012, 0.55, 0.52)
+            hat_p = min(0.98, max(0.2, p['hat_prob'] + 0.5 * cv(i, 'energy', 0))) * (0.5 if light else 1)
             for e in range(8):
-                if random.random() < p['hat_prob']: place(drums, kit_hat(*kit['hat']), T(i, e / 2), 0.35 + 0.15 * (e % 2 == 0), 0.62)
-            if i % 4 == 3: place(drums, kit_hat(kit['hat'][0], 12), T(i, 3.5), 0.35, 0.62)
+                if random.random() < hat_p: place(drums, kit_hat(*kit['hat']), T(i, e / 2), 0.35 + 0.15 * (e % 2 == 0), 0.62)
+            if i % 4 == 3 and not light: place(drums, kit_hat(kit['hat'][0], 12), T(i, 3.5), 0.35, 0.62)
+        if sc in ('A', 'B', 'A2', 'B2'):
             for pos, iv, l in BASSLINES[p['bassline']](i):
                 place(bass, sub_bass(root + iv, l * b), T(i, pos), 0.9)
         if pal['pad'] == 'saw':
@@ -232,7 +253,20 @@ def render(p, out_path):
     amb = to_db(st(vinyl(L, p['vinyl'])), p.get('vinyl_db', -42))
     if tex != 'vinyl':
         amb = amb * 0.6 + (to_db(texture(tex, L), TEXTURE_DB[tex]) if tex != 'none' else 0)
+    if timeline:
+        bar_s = 4 * b
+        # chapter ambience: its own texture fades in over its bars; 'none' thins the song's bed
+        amb = amb * C.env([0.35 if cv(i, 'texture') == 'none' else 1.0 for i in range(bars)], bar_s, L, SR)
+        for tx in sorted({c['texture'] for c in chap if c and c['texture'] not in (None, 'none', tex)}):
+            layer = to_db(texture(tx, L), TEXTURE_DB[tx])
+            amb = amb + layer * C.env([1.0 if cv(i, 'texture') == tx else 0.0 for i in range(bars)], bar_s, L, SR)
+        wet = wet * np.clip(C.env([1 + 2.5 * cv(i, 'space', 0) for i in range(bars)], bar_s, L, SR), 0.3, 2.2)
     mix = dry + wet * p['wet'] + amb
+    if timeline:
+        bd = C.env([cv(i, 'brightness', 0) for i in range(bars)], bar_s, L, SR)
+        dark = np.clip(-bd * 2.5, 0, 0.7); air = np.clip(bd * 1.5, 0, 0.4)
+        if dark.any(): mix = mix * (1 - dark) + lp(mix, 1400, 2) * dark
+        if air.any(): mix = mix + hp(mix, 2500, 2) * air
     t = np.arange(L) / SR; intro_end = 4 * 4 * b; out_start = sect.index('out') * 4 * b
     filt = lp(mix, 900, 2); w = np.clip(t / intro_end, 0, 1) ** 2
     w = np.where(t > out_start, np.clip(1 - (t - out_start) / (4 * 4 * b), 0, 1), w)[:, None]
@@ -240,5 +274,6 @@ def render(p, out_path):
     mix *= np.clip((L / SR - t) / 5, 0, 1)[:, None]
     master(mix, out_path, lufs=LUFS)
     melody_events = [dict(pitch=x[0], start=x[1], dur=x[2]) for x in mel]
-    return dict(lufs_target=LUFS, beat=b, key_pcs=sorted((x + k) % 12 for x in SCALE),
+    sections = [dict(t, start=round(t['bars'][0] * 4 * b, 2), end=round(t['bars'][1] * 4 * b, 2)) for t in timeline]
+    return dict(lufs_target=LUFS, beat=b, sections=sections, key_pcs=sorted((x + k) % 12 for x in SCALE),
                 chords=score, melody=melody_events, key_name=(key_name(k, 'A') + 'm') if p['prog'] in MINOR else (key_name(k, 'D') + ' dorian' if p['prog'] == 'dorian-night' else key_name(k, 'C')), bars=bars)
