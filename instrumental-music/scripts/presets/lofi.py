@@ -151,8 +151,8 @@ def plan(seed, mood=None):
         mood={k: m.get(k) for k in ('energy', 'brightness', 'mode', 'space', 'texture', 'matched') if k in m},
         chapters=C.clean(m.get('chapters')),
     )
-    if len(p['chapters']) >= 5:
-        p['form'] = 'long'   # 5 body sections: A B brk A2 B2
+    if len(p['chapters']) >= 4:
+        p['form'] = 'long'   # 4 main sections: A B A2 B2 (classic/straight have 3)
     return p
 
 

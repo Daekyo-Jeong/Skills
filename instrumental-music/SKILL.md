@@ -61,7 +61,7 @@ mp3는 기본 224k. 스트리밍처럼 용량이 중요하면 `--bitrate 128k`(�
 - `kit`: `dusty`(Rainy Window), `soft`(사이드스틱, 어두운 버스), `punch`(붐뱁), `tape`(포화·먹먹). energy로 후보가 갈린다
 - `scale`: 멜로디 `pent`(펜타토닉) / `diatonic`(7음), `wow` 0.8-2.2 테이프 흔들림, `vinyl_db` -46..-40 바이닐 바닥 크기
 - `bpm` 59-95(energy), `swing` 0.05-0.09, `key` -5..+5 (C 기준), `kick`/`comp`/`bassline` 0-3, `texture`(지정 없으면 vinyl·none·rain·night 중)
-- `--chapters`: 구간별 무드 변화 JSON 배열(곡 순서). 챕터마다 energy·brightness·space 차이(±0.3), texture, lead(악기), drums(full/light/off), label. 본문 구간(A·B·brk·A2·B2)에 순서대로 나눠 담고, 키·템포·진행·팔레트는 곡 전체 그대로. 5개 이상이면 `long` 형식. 구간 시작·끝(초)은 `<genre>_<seed>.json`의 `score.sections`와 report.json `sections`. 형식은 `scripts/chapters.py`. 지금은 lofi만 반영(다른 장르는 무시)
+- `--chapters`: 구간별 무드 변화 JSON 배열(곡 순서). 챕터마다 energy·brightness·space 차이(±0.3), texture, lead(악기), drums(full/light/off), label. 주 구간(A·B·A2·B2)에 순서대로 나눠 담고(break는 앞 챕터를 잇는다), 키·템포·진행·팔레트는 곡 전체 그대로. 4개 이상이면 `long` 형식. 구간 시작·끝(초)은 `<genre>_<seed>.json`의 `score.sections`와 report.json `sections`. 형식은 `scripts/chapters.py`. 지금은 lofi만 반영(다른 장르는 무시)
 
 **newage** (`presets/newage.py`, Tidewater와 같은 -16 LUFS 설정, 실측 약 -15)
 - `pair`: 진행 두 개 조합 (tide/drift/dusk/lift/open/nocturne/lament/morning/glow/plateau/horizon/ember/hollow)

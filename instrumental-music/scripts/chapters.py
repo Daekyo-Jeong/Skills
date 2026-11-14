@@ -1,7 +1,8 @@
 """Chapters: per-section mood changes inside one song.
 
-A chapter is a small change on top of the song's mood, applied to one body section
-(A, B, brk, A2, B2 — never intro/out). The song keeps one key, tempo, progression and
+A chapter is a small change on top of the song's mood, applied to one main section
+(A, B, A2, B2 — never intro/out). A short break (brk) has no melody or drums of its own,
+so it carries on the chapter before it instead of using one up. The song keeps one key, tempo, progression and
 palette so it still sounds like one piece; chapters only move:
 
   energy      -0.3..0.3   drum/comp density (delta on the song's energy)
@@ -24,6 +25,7 @@ TEXTURES = ('vinyl', 'rain', 'fire', 'birds', 'night', 'ocean', 'none')
 DRUMS = ('full', 'light', 'off')
 MAX = 8
 EDGE = ('intro', 'out')
+CARRY = ('brk',)
 
 
 def _num(v):
@@ -82,13 +84,22 @@ def assign(sect, chapters):
     per_bar = [None] * len(sect)
     if not chapters:
         return per_bar, []
-    body = [r for r in runs(sect) if r[0] not in EDGE]
-    n, m = len(chapters), len(body)
+    every = [r for r in runs(sect) if r[0] not in EDGE]
+    main = [r for r in every if r[0] not in CARRY]
+    n, m = len(chapters), len(main)
     timeline = []
-    for s, (name, a, b) in enumerate(body):
-        lo, hi = s * n // m, max(s * n // m + 1, (s + 1) * n // m)
-        idx = list(range(lo, min(hi, n)))
-        ch = _merge([chapters[j] for j in idx])
+    prev = None
+    for name, a, b in every:
+        if name in CARRY:
+            if prev is None:
+                continue
+            idx, ch = prev
+        else:
+            s = main.index((name, a, b))
+            lo, hi = s * n // m, max(s * n // m + 1, (s + 1) * n // m)
+            idx = list(range(lo, min(hi, n)))
+            ch = _merge([chapters[j] for j in idx])
+            prev = (idx, ch)
         for i in range(a, b):
             per_bar[i] = ch
         timeline.append(dict(section=name, bars=[a, b], chapters=idx, label=ch['label']))
