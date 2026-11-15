@@ -80,6 +80,7 @@ def main():
     ap.add_argument('--genre', default='auto', choices=['auto'] + list(GENRES))
     ap.add_argument('--mood', help='free-text mood (Korean/English), mapped by moods.py')
     ap.add_argument('--mood-set', nargs='*', help='explicit mood axes: energy= brightness= mode= space= texture= palette= prog=')
+    ap.add_argument('--chapters', help='per-section mood changes, JSON list (or @file.json); see chapters.py. lofi only for now')
     ap.add_argument('--seed', type=int, help='base seed (default: random). Same seed -> same track')
     ap.add_argument('--variants', type=int, default=1)
     ap.add_argument('--tries', type=int, default=4, help='regeneration attempts per variant on QC failure')
@@ -97,8 +98,14 @@ def main():
     ov = parse_set(a.set)
     import moods
     mood = None
-    if a.mood or a.mood_set:
+    chapters = None
+    if a.chapters:
+        raw = open(a.chapters[1:]).read() if a.chapters.startswith('@') else a.chapters
+        chapters = json.loads(raw)
+    if a.mood or a.mood_set or chapters:
         mood = moods.from_args(a.mood, parse_set(a.mood_set))
+        if chapters:
+            mood['chapters'] = chapters
         print('mood:', json.dumps({k: v for k, v in mood.items() if v not in (None, [])}, ensure_ascii=False), flush=True)
     if a.genre == 'auto':
         a.genre = (mood or {}).get('genre') or 'lofi'
@@ -110,6 +117,7 @@ def main():
     report = [dict(rank=i + 1, mp3=r['mp3'], seed=r['seed'], passed=r['qc']['passed'], score=r['qc']['score'],
                    key=r['key'], palette=r['plan'].get('palette'), texture=r['plan'].get('texture'),
                    bpm=r['plan'].get('bpm'), prog=r['plan'].get('prog') or r['plan'].get('pair'), plan=r['plan'], attempts=r['attempts'],
+                   sections=r['score'].get('sections') or [],
                    lufs=r['qc']['metrics']['lufs'], duration_s=round(r['qc']['metrics']['duration_s'], 1))
               for i, r in enumerate(results)]
     json.dump(report, open(os.path.join(a.out, 'report.json'), 'w'), indent=1)
